@@ -1,0 +1,1 @@
+- Give kit the qutebrowser skill which works on my fork of qutebrowser in a separate X render (that only it can see) and it can do actions for me, I can bring that X render forward though. (Holy engineering!)
