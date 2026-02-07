@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSS Pseudo-elements & Pseudo-classes</title>
+  <style>
+    :root {
+      --bg: #0a0a12;
+      --fg: #c8d6e5;
+      --heading: #e8e8e8;
+      --accent: #8ab4f8;
+      --accent2: #f8c471;
+      --card-bg: #141422;
+      --card-border: #2a2a3a;
+      --code-bg: #1e1e2e;
+    }
+
+    body.light {
+      --bg: #f5f5f0;
+      --fg: #333;
+      --heading: #111;
+      --accent: #2563eb;
+      --accent2: #d97706;
+      --card-bg: #fff;
+      --card-border: #ddd;
+      --code-bg: #e8e8e8;
+    }
+
+    body {
+      font-family: system-ui, sans-serif;
+      max-width: 700px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+      background: var(--bg);
+      color: var(--fg);
+      transition: background 0.3s, color 0.3s;
+    }
+
+    h1 { color: var(--heading); }
+    h2 { color: var(--accent); margin-top: 2.5rem; }
+    h3 { color: var(--heading); margin-top: 2rem; }
+
+    .example {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
+      padding: 1.5rem;
+      margin: 0.75rem 0;
+      transition: background 0.3s, border-color 0.3s;
+    }
+
+    code {
+      background: var(--code-bg);
+      padding: 0.15em 0.4em;
+      border-radius: 3px;
+      font-size: 0.9em;
+      color: var(--accent2);
+      transition: background 0.3s;
+    }
+
+    /* --- Theme toggle --- */
+    .theme-toggle {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      background: var(--card-bg);
+      color: var(--fg);
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      font-size: 0.9em;
+      transition: background 0.3s, color 0.3s, border-color 0.3s;
+    }
+
+    /* ======================== */
+    /*     PSEUDO-ELEMENTS      */
+    /* ======================== */
+
+    /* ::before and ::after */
+    .quote {
+      font-style: italic;
+      font-size: 1.1em;
+    }
+    .quote::before {
+      content: "\201C";
+      font-size: 1.5em;
+      color: var(--accent);
+      margin-right: 2px;
+    }
+    .quote::after {
+      content: "\201D";
+      font-size: 1.5em;
+      color: var(--accent);
+      margin-left: 2px;
+    }
+
+    /* ::first-letter */
+    .drop-cap::first-letter {
+      font-size: 2.5em;
+      font-weight: bold;
+      color: var(--accent2);
+      float: left;
+      line-height: 1;
+      margin-right: 0.1em;
+    }
+
+    /* ::first-line */
+    .first-line-demo::first-line {
+      font-weight: bold;
+      color: var(--heading);
+      text-transform: uppercase;
+    }
+
+    /* ::selection */
+    .selection-demo::selection {
+      background: var(--accent2);
+      color: var(--bg);
+    }
+
+    /* ::placeholder */
+    .placeholder-demo {
+      background: var(--code-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 4px;
+      padding: 0.5rem;
+      color: var(--fg);
+      font-size: 1em;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .placeholder-demo::placeholder {
+      color: var(--accent);
+      font-style: italic;
+    }
+
+    /* ::marker */
+    .marker-demo li::marker {
+      color: var(--accent2);
+      font-weight: bold;
+      font-size: 1.2em;
+    }
+
+    /* ======================== */
+    /*     PSEUDO-CLASSES       */
+    /* ======================== */
+
+    /* :hover */
+    .hover-box {
+      background: var(--card-bg);
+      border: 2px solid var(--card-border);
+      border-radius: 6px;
+      padding: 1rem;
+      text-align: center;
+      transition: background 0.2s, border-color 0.2s, transform 0.2s;
+      cursor: default;
+    }
+    .hover-box:hover {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--bg);
+      transform: scale(1.02);
+    }
+
+    /* :active */
+    .active-btn {
+      background: var(--accent);
+      color: var(--bg);
+      border: none;
+      border-radius: 6px;
+      padding: 0.6rem 1.5rem;
+      font-size: 1em;
+      cursor: pointer;
+      transition: transform 0.1s, filter 0.1s;
+    }
+    .active-btn:active {
+      transform: scale(0.93);
+      filter: brightness(0.7);
+    }
+
+    /* :focus */
+    .focus-input {
+      background: var(--code-bg);
+      border: 2px solid var(--card-border);
+      border-radius: 4px;
+      padding: 0.5rem;
+      color: var(--fg);
+      font-size: 1em;
+      width: 100%;
+      box-sizing: border-box;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .focus-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 30%, transparent);
+    }
+
+    /* :nth-child */
+    .nth-list {
+      list-style: none;
+      padding: 0;
+    }
+    .nth-list li {
+      padding: 0.5rem 0.75rem;
+      border-radius: 4px;
+    }
+    .nth-list li:nth-child(odd) {
+      background: color-mix(in srgb, var(--accent) 10%, transparent);
+    }
+    .nth-list li:nth-child(even) {
+      background: color-mix(in srgb, var(--accent2) 10%, transparent);
+    }
+
+    /* :first-child / :last-child */
+    .fl-list {
+      list-style: none;
+      padding: 0;
+    }
+    .fl-list li {
+      padding: 0.5rem 0.75rem;
+    }
+    .fl-list li:first-child {
+      color: var(--accent);
+      font-weight: bold;
+    }
+    .fl-list li:last-child {
+      color: var(--accent2);
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+  <button class="theme-toggle" onclick="document.body.classList.toggle('light'); this.textContent = document.body.classList.contains('light') ? 'Dark mode' : 'Light mode'">Light mode</button>
+
+  <h1>CSS Pseudo-elements & Pseudo-classes</h1>
+  <p>Pseudo-<strong>elements</strong> (<code>::</code>) target a sub-part of an element.<br>
+     Pseudo-<strong>classes</strong> (<code>:</code>) target an element's state.</p>
+
+  <!-- ===== PSEUDO-ELEMENTS ===== -->
+  <h2>Pseudo-elements</h2>
+
+  <h3><code>::before</code> and <code>::after</code></h3>
+  <div class="example">
+    <p class="quote">The only way to do great work is to love what you do.</p>
+  </div>
+  <p>The curly quotes are injected via <code>content</code> in <code>::before</code> and <code>::after</code>.</p>
+
+  <h3><code>::first-letter</code></h3>
+  <div class="example">
+    <p class="drop-cap">Once upon a time there was a paragraph whose first letter was styled entirely with CSS. No wrapper span needed.</p>
+  </div>
+
+  <h3><code>::first-line</code></h3>
+  <div class="example">
+    <p class="first-line-demo">This first line is bold and uppercase automatically. Resize the window and watch which words count as the "first line" change dynamically — it's based on rendering, not markup.</p>
+  </div>
+
+  <h3><code>::selection</code></h3>
+  <div class="example">
+    <p class="selection-demo">Try selecting this text with your mouse. The highlight color is custom — orange background with dark text instead of the default blue.</p>
+  </div>
+
+  <h3><code>::placeholder</code></h3>
+  <div class="example">
+    <input class="placeholder-demo" type="text" placeholder="This italic blue text is styled via ::placeholder">
+  </div>
+
+  <h3><code>::marker</code></h3>
+  <div class="example">
+    <ul class="marker-demo">
+      <li>This bullet is orange and bold</li>
+      <li>Styled with just ::marker</li>
+      <li>No custom list-style hacks needed</li>
+    </ul>
+  </div>
+
+  <!-- ===== PSEUDO-CLASSES ===== -->
+  <h2>Pseudo-classes</h2>
+
+  <h3><code>:hover</code></h3>
+  <div class="example">
+    <div class="hover-box">Hover over me — background, border, and scale change</div>
+  </div>
+
+  <h3><code>:active</code></h3>
+  <div class="example">
+    <button class="active-btn">Click and hold me — I shrink and darken</button>
+  </div>
+
+  <h3><code>:focus</code></h3>
+  <div class="example">
+    <input class="focus-input" type="text" placeholder="Click here — the border and glow change on focus">
+  </div>
+
+  <h3><code>:nth-child(odd)</code> / <code>:nth-child(even)</code></h3>
+  <div class="example">
+    <ul class="nth-list">
+      <li>Odd row (blue tint)</li>
+      <li>Even row (orange tint)</li>
+      <li>Odd row (blue tint)</li>
+      <li>Even row (orange tint)</li>
+      <li>Odd row (blue tint)</li>
+    </ul>
+  </div>
+
+  <h3><code>:first-child</code> / <code>:last-child</code></h3>
+  <div class="example">
+    <ul class="fl-list">
+      <li>I'm :first-child — bold and blue</li>
+      <li>I'm just a regular middle child</li>
+      <li>I'm also a regular middle child</li>
+      <li>I'm :last-child — italic and orange</li>
+    </ul>
+  </div>
+</body>
+</html>

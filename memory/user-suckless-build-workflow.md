@@ -4,6 +4,7 @@ Workflow for modifying user's suckless tools (dwm, st, dmenu, etc.)
 Suckless configs are in: `/home/yeyito/Config/<tool>/config.h`
 - dwm: `/home/yeyito/Config/dwm/config.h`
 - st: `/home/yeyito/Config/st/config.h`
+- dmenu: `/home/yeyito/Config/dmenu/config.h` (vi-mode patch applied, starts in normal mode)
 
 # After Modifying
 Always build and install after making changes:
@@ -16,6 +17,7 @@ No need for `make clean` - just `make && sudo make install`.
 # Applying Changes
 - **dwm**: Restart dwm (re-login or `kill -HUP $(pidof dwm)`)
 - **st**: New terminals will use updated config; existing terminals unaffected
+- **dmenu**: Takes effect immediately on next invocation
 
 # Notes
 - config.h files will show clang errors when analyzed standalone - this is expected since they're included during the main build

@@ -2,7 +2,7 @@
 from pathlib import Path
 
 KIT_DIR = Path(__file__).parent.parent
-DOCS_DIR = KIT_DIR / "docs"
+DOCS_DIR = KIT_DIR / "memory"
 CLAUDE_MD = KIT_DIR / "CLAUDE.md"
 
 
@@ -12,7 +12,7 @@ def setup_memory_pointers():
     if DOCS_DIR.exists():
         for mem_file in sorted(DOCS_DIR.glob("*.md")):
             first_line = mem_file.read_text().split('\n')[0].strip()
-            rel_path = f"docs/{mem_file.name}"
+            rel_path = f"memory/{mem_file.name}"
             pointers.append(f"- {rel_path} — {first_line}")
 
     block = "# Memory pointers (run src/refresh_pointers.py after creating/deleting memories):\n```md\n"
