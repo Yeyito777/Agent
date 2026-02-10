@@ -11,6 +11,13 @@ if [[ -n "${RECALL_HOOK_RUNNING:-}" ]]; then
   exit 0
 fi
 
+# --- Check agent.conf toggle ---
+CONF="${CLAUDE_PROJECT_DIR:-}/agent.conf"
+if [[ -f "$CONF" ]] && grep -qx 'MEMORY_UPDATE=off' "$CONF"; then
+  cat > /dev/null
+  exit 0
+fi
+
 INPUT=$(cat)
 AGENT_DIR="$CLAUDE_PROJECT_DIR"
 LOG="${AGENT_DIR}/runtime/hook-${AGENT_HOOK_ID:-none}.log"

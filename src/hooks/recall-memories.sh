@@ -12,6 +12,13 @@ if [[ -n "${RECALL_HOOK_RUNNING:-}" ]]; then
   exit 0
 fi
 
+# --- Check agent.conf toggle ---
+CONF="${CLAUDE_PROJECT_DIR:-}/agent.conf"
+if [[ -f "$CONF" ]] && grep -qx 'MEMORY_RECALL=off' "$CONF"; then
+  cat > /dev/null
+  exit 0
+fi
+
 INPUT=$(cat)
 
 # --- Require AGENT_HOOK_ID (set by agent() in ~/.zshrc) ---
@@ -78,12 +85,12 @@ ${POINTERS}"
 log "Calling opus..."
 log "Query being sent: ${QUERY:0:300}..."
 STDERR_LOG=$(mktemp)
-RESULT=$(echo "$QUERY" | AGENT_HOOK_ID="" RECALL_HOOK_RUNNING=1 timeout 25 claude -p \
+RESULT=$(echo "$QUERY" | (cd /tmp && AGENT_HOOK_ID="" RECALL_HOOK_RUNNING=1 timeout 25 claude -p \
   --model opus \
   --max-turns 1 \
   --no-session-persistence \
   --system-prompt "$SYSTEM_PROMPT" \
-  2>"$STDERR_LOG") || { log "SKIP: claude -p failed or timed out (exit $?)"; log "stderr: $(cat "$STDERR_LOG")"; rm -f "$STDERR_LOG"; exit 0; }
+  2>"$STDERR_LOG")) || { log "SKIP: claude -p failed or timed out (exit $?)"; log "stderr: $(cat "$STDERR_LOG")"; rm -f "$STDERR_LOG"; exit 0; }
 if [[ -s "$STDERR_LOG" ]]; then
   log "claude -p stderr: $(cat "$STDERR_LOG")"
 fi

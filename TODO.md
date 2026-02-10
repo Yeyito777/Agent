@@ -1,6 +1,7 @@
-- Give Agent the qutebrowser skill which works on my fork of qutebrowser in a separate X render (that only it can see) and it can do actions for me, I can bring that X render forward though. (Holy engineering!)
-- Give Agent the following skills:
-    - get and send email
-    - browser use [Refer to the first todo item]
-- Patch LibrePods ear detection to switch PipeWire audio sink (AirPods on → AirPods sink, AirPods off → speakers). See reference/librepods-ear-switch-patch.md for the full plan.
-- Clean up disk. See memory/disk-audit-cleanup-guide.md for the full audit and candidates.
+- [ ] Memory audit / cleaner agent in a cron job that checks that everything is up to date and also makes sure that titles, and descriptions can be easily picked up by context and by the recall subagent
+
+- [ ] Merge the memory update subagent with a new agent: memory creator agent, (do this after you have st notifications) and find a way to run it in this directory or /memory directory without CLAUDE.md being injected.
+
+- [ ] See if it's safe to remove pointers from CLAUDE.md after the memory recall subagent was introduced, do this after you can get st notifications for better auditing 
+
+- [ ] When an agent finishes through the claude finish convo hook make sure it notifies the window in the wm such that it shows up with a notif on it (I can check on it) (This should be a global hook)

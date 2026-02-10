@@ -1,13 +1,13 @@
 Automatic memory recall system — how memories are surfaced via hooks, architecture, and debugging
 
 # Overview
-Two hook-driven subsystems:
-1. **Recall** — A `UserPromptSubmit` hook spawns a one-shot `claude -p --model opus` call to determine which memories are relevant to the user's prompt. Relevant memories are surfaced once per session via deduplication.
-2. **Auto-update** — A `Stop` hook (async) spawns a subclaude after every response that reviews the conversation transcript and updates/creates memories if new persistent information was discussed.
+Two hook-driven subagents, both toggleable via `agent.conf`:
+1. **Recall agent** — A `UserPromptSubmit` hook spawns a one-shot `claude -p --model opus` call to determine which memories are relevant to the user's prompt. Relevant memories are surfaced once per session via deduplication. Toggle: `MEMORY_RECALL=on|off`.
+2. **Update agent** — A `Stop` hook (async) spawns a subclaude after every response that reviews the conversation transcript and updates/creates memories if new persistent information was discussed. Toggle: `MEMORY_UPDATE=on|off`.
 
 # Architecture
 
-## Shell launcher (`~/.zshrc` `agent()`)
+## Shell launcher (`src/start.sh`, aliased as `agent` in `~/.zshrc`)
 1. `cd` to Agent project
 2. Runs `src/refresh_pointers.py` to update CLAUDE.md pointer section
 3. Generates `AGENT_HOOK_ID` via `openssl rand -hex 4` (8 hex chars), exports it
@@ -45,9 +45,18 @@ Flow:
 ## Cleanup hook (`src/hooks/cleanup-runtime.sh`)
 Wired to `SessionEnd`. Deletes `runtime/recalled-<id>` and `runtime/hook-<id>.log`.
 
+# Configuration
+`agent.conf` at project root controls which subagents are active:
+```
+MEMORY_RECALL=on    # recall agent (UserPromptSubmit)
+MEMORY_UPDATE=on    # update agent (Stop, async)
+```
+Set to `off` to disable. Checked on every hook invocation — no restart needed. Both hooks check this file early and exit 0 silently if disabled.
+
 # Key files
-- `src/hooks/recall-memories.sh` — recall hook (referenced by `.claude/settings.local.json`)
-- `src/hooks/update-memories.sh` — auto-update hook (referenced by `.claude/settings.local.json`)
+- `agent.conf` — subagent toggles (MEMORY_RECALL, MEMORY_UPDATE)
+- `src/hooks/recall-memories.sh` — recall agent hook (referenced by `.claude/settings.local.json`)
+- `src/hooks/update-memories.sh` — update agent hook (referenced by `.claude/settings.local.json`)
 - `src/hooks/cleanup-runtime.sh` — cleanup hook (referenced by `.claude/settings.local.json`)
 - `src/hooks/test-recall.sh` — test harness for the recall system (run with `bash src/hooks/test-recall.sh`)
 - `.claude/settings.local.json` — hook wiring (project-local, gitignored by Claude Code)
