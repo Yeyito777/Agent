@@ -11,8 +11,9 @@ Two hook-driven subagents, both toggleable via `agent.conf`:
 1. `cd` to Agent project
 2. Runs `src/refresh_pointers.py` to update CLAUDE.md pointer section
 3. Generates `AGENT_HOOK_ID` via `openssl rand -hex 4` (8 hex chars), exports it
-4. Creates `runtime/recalled-<id>` (dedup ledger) and `runtime/hook-<id>.log` (debug log)
-5. Launches `claude --dangerously-skip-permissions`
+4. Captures `AGENT_TERMINAL_PID` by walking up the process tree: first looks for an ancestor named `st`, falls back to first ancestor owning an X window. Exported for hooks to use with `st-notify`
+5. Creates `runtime/recalled-<id>` (dedup ledger) and `runtime/hook-<id>.log` (debug log)
+6. Launches `claude --dangerously-skip-permissions`
 
 ## Recall hook (`src/hooks/recall-memories.sh`)
 Wired as `UserPromptSubmit` in `.claude/settings.local.json` (30s timeout, "Recalling memories..." spinner).
@@ -25,7 +26,8 @@ Flow per message:
 5. Inner `claude -p` runs with `AGENT_HOOK_ID=""` and `RECALL_HOOK_RUNNING=1` (see gotchas below)
 6. Parses opus response: validates files exist on disk, checks against `recalled-<id>` for dedup
 7. New memories appended to tracking file, output as `Relevant memories: memory/foo.md memory/bar.md`
-8. stdout with exit 0 = context injected into the main Claude session
+8. If memories were recalled and `AGENT_TERMINAL_PID` is set, fires one `st-notify` toast per memory (7s timeout, small text, warm peach `#ffaf87` border/fg on dark `#0a0806` bg, backgrounded)
+9. stdout with exit 0 = context injected into the main Claude session
 
 ## Resume hook (inline in `.claude/settings.local.json`)
 Wired to `SessionStart` with `"matcher": "resume"`. Truncates `runtime/recalled-<id>` so the dedup ledger resets on session resume. This allows all memories to be re-surfaced when switching between sessions, since the previous session's conversation context may no longer be present.

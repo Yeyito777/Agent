@@ -129,6 +129,15 @@ done <<< "$RESULT"
 if [[ ${#NEW_MEMORIES[@]} -gt 0 ]]; then
   log "OUTPUT: Relevant memories: ${NEW_MEMORIES[*]}"
   echo "Relevant memories: ${NEW_MEMORIES[*]}"
+
+  # Notify terminal via st-notify (one toast per memory)
+  if [[ -n "${AGENT_TERMINAL_PID:-}" ]] && command -v st-notify &>/dev/null; then
+    for mem in "${NEW_MEMORIES[@]}"; do
+      st-notify -t 7000 -ts 16 -b "#ffaf87" -bg "#0a0806" -fg "#ffaf87" \
+        "$AGENT_TERMINAL_PID" "recalled ${mem}" &>/dev/null &
+    done
+    log "Sent ${#NEW_MEMORIES[@]} st-notify toasts to PID ${AGENT_TERMINAL_PID}"
+  fi
 else
   log "No new memories to surface"
 fi
