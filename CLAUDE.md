@@ -11,6 +11,7 @@ If the user requesets you to create a memory you must follow the following guide
 # Memory pointers (run src/refresh_pointers.py after creating/deleting memories):
 ```md
 - memory/about-user-todo-organization.md — User's todo file organization (personal todo, project TODOs, "my todo" terminology)
+- memory/automatic-memory-recall-system.md — Automatic memory recall system — how memories are surfaced via hooks, architecture, and debugging
 - memory/claude-code-binary-inspection.md — Inspecting Claude Code's bundled binary for source code and config validation (strings, ELF, minified JS)
 - memory/disk-audit-cleanup-guide.md — Disk audit and cleanup guide for the user's Arch Linux system (single 916G NVMe, ext4, ~68G used as of Feb 2026)
 - memory/dmenu-usage-and-scripting.md — How dmenu works, where scripts go, and how it integrates with dwm
@@ -23,3 +24,4 @@ If the user requesets you to create a memory you must follow the following guide
 - memory/user-terminal-color-scheme.md — Ocean-themed st terminal palette (hex values, ANSI escapes, color names)
 - memory/watchdog-shutdown-message.md — Watchdog "did not stop!" shutdown message — cause, fix, and future server considerations.
 ```
+
