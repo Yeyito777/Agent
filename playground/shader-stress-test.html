@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shader Stress Test</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: monospace;
+    background: #ffffff;
+    color: #000000;
+    padding: 20px;
+    line-height: 1.6;
+  }
+  h1 { font-size: 1.4em; border-bottom: 2px solid #000; padding-bottom: 4px; }
+  h2 { font-size: 1.1em; margin-top: 2em; background: #eee; padding: 4px 8px; }
+  section { margin-bottom: 1.5em; padding: 10px; border: 1px solid #ccc; }
+  label { display: block; margin: 4px 0; }
+
+  /* Force scrollbars on specific containers */
+  .scroll-box {
+    width: 300px; height: 80px;
+    overflow: scroll;
+    border: 1px solid #000;
+    padding: 4px;
+  }
+
+  /* Resize handle test */
+  .resize-box {
+    width: 200px; height: 60px;
+    resize: both;
+    overflow: auto;
+    border: 2px solid #000;
+    padding: 4px;
+    background: #fff;
+  }
+
+  /* Selection test */
+  .selection-test::selection { background: #ff0000; color: #ffffff; }
+  .selection-test::-moz-selection { background: #ff0000; color: #ffffff; }
+
+  /* Placeholder test */
+  .placeholder-test::placeholder { color: #ff00ff; opacity: 1; }
+  .placeholder-test::-webkit-input-placeholder { color: #ff00ff; }
+
+  /* Caret color test */
+  .caret-test { caret-color: #ff0000; }
+
+  /* Pseudo-element generated content */
+  .before-after::before { content: "[BEFORE] "; color: red; font-weight: bold; }
+  .before-after::after { content: " [AFTER]"; color: blue; font-weight: bold; }
+
+  /* List marker test */
+  .marker-test::marker { color: #ff0000; font-size: 1.5em; }
+
+  /* Counter-generated content */
+  .counter-list { counter-reset: items; list-style: none; padding: 0; }
+  .counter-list li::before {
+    counter-increment: items;
+    content: "Item #" counter(items) " → ";
+    color: #ff6600;
+    font-weight: bold;
+  }
+
+  /* File selector button */
+  input[type="file"]::file-selector-button {
+    background: #0000ff;
+    color: #ffffff;
+    border: none;
+    padding: 4px 12px;
+    cursor: pointer;
+  }
+
+  /* Autofill simulation (triggers on actual autofill) */
+  input:-webkit-autofill {
+    background-color: #e8f0fe !important;
+    -webkit-text-fill-color: #000 !important;
+  }
+
+  /* Backdrop for dialog */
+  dialog::backdrop {
+    background: rgba(255, 0, 0, 0.5);
+  }
+
+  /* Scrollbar styling to see if shader overrides it */
+  .custom-scrollbar::-webkit-scrollbar { width: 12px; background: #00ff00; }
+  .custom-scrollbar::-webkit-scrollbar-thumb { background: #ff0000; border: 1px solid #0000ff; }
+  .custom-scrollbar::-webkit-scrollbar-track { background: #ffff00; }
+  .custom-scrollbar::-webkit-scrollbar-corner { background: #ff00ff; }
+
+  /* Highlight pseudo (newer browsers) */
+  ::highlight(test-highlight) { background-color: #ffff00; color: #000; }
+
+  /* Target pseudo */
+  :target { outline: 3px solid red; }
+
+  /* Focus-visible vs focus */
+  .focus-visible-test:focus-visible { outline: 3px dashed #ff0000; }
+  .focus-visible-test:focus:not(:focus-visible) { outline: 3px solid #0000ff; }
+
+  /* First-letter / first-line */
+  .first-letter-test::first-letter { font-size: 2em; color: #ff0000; float: left; }
+  .first-line-test::first-line { color: #0000ff; font-weight: bold; text-transform: uppercase; }
+</style>
+</head>
+<body>
+
+<h1>Shader Stress Test</h1>
+<p>Every section targets a rendering path that may bypass computed-style interception.</p>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2>1. Native Form Controls</h2>
+<!-- ═══════════════════════════════════════════ -->
+<section>
+  <p>These render via the OS/browser widget toolkit, not the DOM paint path.</p>
+
+  <label>Color picker: <input type="color" value="#ff6600"></label>
+  <label>Range slider: <input type="range" min="0" max="100" value="50"></label>
+  <label>Date: <input type="date" value="2026-02-09"></label>
+  <label>Time: <input type="time" value="14:30"></label>
+  <label>Datetime-local: <input type="datetime-local" value="2026-02-09T14:30"></label>
+  <label>Month: <input type="month" value="2026-02"></label>
+  <label>Week: <input type="week" value="2026-W06"></label>
+  <label>Number spinner: <input type="number" value="42" min="0" max="100"></label>
+  <label>Search (with cancel button): <input type="search" value="search text"></label>
+  <label>File: <input type="file" accept="*/*"></label>
+  <label>File (multiple): <input type="file" multiple accept="*/*"></label>
+  <label>Checkbox: <input type="checkbox" checked> <input type="checkbox"></label>
+  <label>Radio: <input type="radio" name="r1" checked> <input type="radio" name="r1"></label>
+
+  <label>Select dropdown:
+    <select>
+      <optgroup label="Group A">
+        <option>Option 1</option>
+        <option>Option 2</option>
+      </optgroup>
+      <optgroup label="Group B">
+        <option>Option 3</option>
+        <option>Option 4</option>
+      </optgroup>
+    </select>
+  </label>
+
+  <label>Select (multiple/listbox):
+    <select multiple size="4">
+      <option>Alpha</option>
+      <option selected>Beta</option>
+      <option>Gamma</option>
+      <option>Delta</option>
+      <option>Epsilon</option>
+    </select>
+  </label>
+
+  <label>Datalist input:
+    <input list="fruits" placeholder="Type a fruit...">
+    <datalist id="fruits">
+      <option value="Apple">
+      <option value="Banana">
+      <option value="Cherry">
+      <option value="Dragonfruit">
+      <option value="Elderberry">
+    </datalist>
+  </label>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2>2. Meter &amp; Progress (Native Gauge Elements)</h2>
+<!-- ═══════════════════════════════════════════ -->
+<section>
+  <label>Progress (indeterminate): <progress></progress></label>
+  <label>Progress (50%): <progress value="50" max="100"></progress></label>
+  <label>Meter (low): <meter value="0.2" min="0" max="1" low="0.3" high="0.7" optimum="0.8"></meter></label>
+  <label>Meter (mid): <meter value="0.5" min="0" max="1" low="0.3" high="0.7" optimum="0.8"></meter></label>
+  <label>Meter (high): <meter value="0.9" min="0" max="1" low="0.3" high="0.7" optimum="0.8"></meter></label>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2>3. Details/Summary (Native Disclosure Widget)</h2>
+<!-- ═══════════════════════════════════════════ -->
+<section>
+  <details>
+    <summary>Click to expand (native disclosure triangle)</summary>
+    <p>Hidden content revealed by the native toggle widget. The triangle marker is browser-drawn.</p>
+  </details>
+  <details open>
+    <summary>Already open</summary>
+    <p>This one starts expanded.</p>
+  </details>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2>4. Dialog Element &amp; ::backdrop</h2>
+<!-- ═══════════════════════════════════════════ -->
+<section>
+  <dialog id="testDialog" style="border: 2px solid #000; padding: 20px;">
+    <p>This is a native &lt;dialog&gt;. The ::backdrop behind it is browser-rendered.</p>
+    <form method="dialog"><button>Close</button></form>
+  </dialog>
+  <button onclick="document.getElementById('testDialog').showModal()">Open Modal Dialog</button>
+  <button onclick="document.getElementById('testDialog').show()">Open Non-Modal Dialog</button>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2>5. Popover API</h2>
+<!-- ═══════════════════════════════════════════ -->
+<section>
+  <button popovertarget="pop1">Toggle Popover</button>
+  <div id="pop1" popover style="background:#fff; border:2px solid #000; padding:16px;">
+    Native popover via the Popover API. Rendered in the top layer.
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2>6. Scrollbars</h2>
+<!-- ═══════════════════════════════════════════ -->
+<section>
+  <p>Default scrollbar:</p>
+  <div class="scroll-box">
+    Line 1<br>Line 2<br>Line 3<br>Line 4<br>Line 5<br>
+    Line 6<br>Line 7<br>Line 8<br>Line 9<br>Line 10<br>
+  </div>
+
+  <p>Styled scrollbar (green/red/yellow — does the shader override these?):</p>
+  <div class="scroll-box custom-scrollbar">
+    Line 1<br>Line 2<br>Line 3<br>Line 4<br>Line 5<br>
+    Line 6<br>Line 7<br>Line 8<br>Line 9<br>Line 10<br>
+  </div>
+
+  <p>Horizontal + vertical overflow:</p>
+  <div style="width:200px; height:60px; overflow:scroll; border:1px solid #000; white-space:nowrap;">
+    This line is intentionally very long to force a horizontal scrollbar to appear in this container so we can test it ████████████████████████
+    <br>Line 2<br>Line 3<br>Line 4<br>Line 5<br>Line 6<br>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2>7. Resize Handles</h2>
+<!-- ═══════════════════════════════════════════ -->
+<section>
+  <p>The drag handle in the corner is browser-native:</p>
+  <div class="resize-box">Resize me (both directions)</div>
+  <br>
+  <textarea rows="3" cols="40" style="resize:both;">Textarea resize handle</textarea>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2>8. Pseudo-Elements (::before, ::after, ::marker, ::first-letter, ::first-line)</h2>
+<!-- ═══════════════════════════════════════════ -->
+<section>
+  <p class="before-after">This text has red ::before and blue ::after pseudo-elements.</p>
+
+  <ul>
+    <li class="marker-test">Red oversized ::marker bullet</li>
+    <li class="marker-test">Another one</li>
+  </ul>
+
+  <ol class="counter-list">
+    <li>Counter-generated prefix via ::before</li>
+    <li>Second item</li>
+    <li>Third item</li>
+  </ol>
+
+  <p class="first-letter-test">Lorem ipsum dolor sit amet. The first letter should be 2em red and floated.</p>
+  <p class="first-line-test">This paragraph has a ::first-line rule that makes the first rendered line blue, bold, and uppercase. Resize the window to see it change which text gets the treatment.</p>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2>9. ::selection</h2>
+<!-- ═══════════════════════════════════════════ -->
+<section>
+  <p class="selection-test">Select this text. The selection should be red background / white text via ::selection. If the shader doesn't reach it, it'll use default blue.</p>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2>10. ::placeholder &amp; Caret Color</h2>
+<!-- ═══════════════════════════════════════════ -->
+<section>
+  <label>Magenta placeholder: <input type="text" class="placeholder-test" placeholder="I should be magenta"></label>
+  <label>Red caret (click in): <input type="text" class="caret-test" value="click here, watch the caret"></label>
+  <label>Textarea placeholder: <textarea class="placeholder-test" placeholder="Magenta placeholder in textarea"></textarea></label>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2>11. Shadow DOM (Custom Elements)</h2>
+<!-- ═══════════════════════════════════════════ -->
+<section>
+  <p>Content inside shadow roots is isolated from the outer document's style cascade.</p>
+  <div id="shadow-host-open"><!-- open shadow root injected via JS --></div>
+  <div id="shadow-host-closed"><!-- closed shadow root injected via JS --></div>
+  <script>
+    // Open shadow DOM
+    const openHost = document.getElementById('shadow-host-open');
+    const openShadow = openHost.attachShadow({ mode: 'open' });
+    openShadow.innerHTML = `
+      <style>
+        :host { display: block; border: 2px dashed green; padding: 8px; margin: 4px 0; }
+        p { color: #ff0000; background: #ffffcc; padding: 4px; }
+        input { border: 2px solid #ff0000; padding: 4px; }
+      </style>
+      <p>Open Shadow DOM — red text, yellow bg. Shader can't reach in here via computed styles.</p>
+      <input type="text" value="Shadow input" />
+      <input type="range" min="0" max="100" value="30" />
+      <select><option>Shadow select</option><option>Option 2</option></select>
+    `;
+
+    // Closed shadow DOM
+    const closedHost = document.getElementById('shadow-host-closed');
+    const closedShadow = closedHost.attachShadow({ mode: 'closed' });
+    closedShadow.innerHTML = `
+      <style>
+        :host { display: block; border: 2px dashed purple; padding: 8px; margin: 4px 0; }
+        p { color: #0000ff; background: #ccffcc; padding: 4px; }
+      </style>
+      <p>Closed Shadow DOM — blue text, green bg. Even more isolated; JS can't access this from outside.</p>
+    `;
+  </script>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2>12. Video &amp; Audio Controls (Internal Shadow DOM)</h2>
+<!-- ═══════════════════════════════════════════ -->
+<section>
+  <p>Browser media controls live in shadow DOM. Play/pause, scrubber, volume — all native.</p>
+  <!-- Blank video with controls visible -->
+  <video controls width="400" height="50" style="background:#000;">
+    <source src="data:video/mp4;base64,AAAAHGZ0eXBNNFYgAAACAGlzb21pc28yYXZjMQ==" type="video/mp4">
+  </video>
+  <br>
+  <audio controls>
+    <source src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=" type="audio/wav">
+  </audio>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2>13. Canvas (2D &amp; WebGL)</h2>
+<!-- ═══════════════════════════════════════════ -->
+<section>
+  <p>Canvas content bypasses CSS entirely — it's rasterized by the GPU/CPU, not the style engine.</p>
+  <canvas id="canvas2d" width="300" height="80" style="border:1px solid #000;"></canvas>
+  <canvas id="canvasGL" width="300" height="80" style="border:1px solid #000;"></canvas>
+  <script>
+    // 2D Canvas
+    const ctx = document.getElementById('canvas2d').getContext('2d');
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, 300, 80);
+    ctx.fillStyle = '#ff0000';
+    ctx.fillRect(10, 10, 60, 60);
+    ctx.fillStyle = '#00ff00';
+    ctx.fillRect(80, 10, 60, 60);
+    ctx.fillStyle = '#0000ff';
+    ctx.fillRect(150, 10, 60, 60);
+    ctx.fillStyle = '#000000';
+    ctx.font = '14px monospace';
+    ctx.fillText('2D Canvas — shader blind', 10, 78);
+
+    // WebGL Canvas
+    const gl = document.getElementById('canvasGL').getContext('webgl');
+    if (gl) {
+      gl.clearColor(1.0, 0.5, 0.0, 1.0); // orange
+      gl.clear(gl.COLOR_BUFFER_BIT);
+    }
+  </script>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2>14. SVG (Inline, Filters, foreignObject)</h2>
+<!-- ═══════════════════════════════════════════ -->
+<section>
+  <p>SVG uses its own rendering pipeline. fill/stroke ≠ CSS color/background.</p>
+  <svg width="300" height="100" style="border:1px solid #000; background:#fff;">
+    <rect x="5" y="5" width="50" height="50" fill="#ff0000" stroke="#000" stroke-width="2"/>
+    <circle cx="100" cy="30" r="25" fill="#00ff00" stroke="#000" stroke-width="2"/>
+    <text x="140" y="35" font-family="monospace" font-size="12" fill="#0000ff">SVG text element</text>
+    <line x1="5" y1="70" x2="295" y2="70" stroke="#ff00ff" stroke-width="2"/>
+    <polygon points="220,10 250,55 190,55" fill="#ffcc00" stroke="#000" stroke-width="1"/>
+    <!-- SVG filter -->
+    <defs>
+      <filter id="blur1"><feGaussianBlur stdDeviation="2"/></filter>
+    </defs>
+    <text x="5" y="95" font-size="12" fill="#000" filter="url(#blur1)">Blurred via SVG filter</text>
+  </svg>
+
+  <p>SVG foreignObject (HTML inside SVG):</p>
+  <svg width="300" height="60" style="border:1px solid #000;">
+    <foreignObject x="5" y="5" width="290" height="50">
+      <div xmlns="http://www.w3.org/1999/xhtml" style="background:#ffe0e0; padding:4px; font-size:12px;">
+        HTML inside SVG foreignObject. Does the shader reach this?
+        <input type="text" value="input inside foreignObject" style="width:200px;">
+      </div>
+    </foreignObject>
+  </svg>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2>15. Iframes (Separate Document Context)</h2>
+<!-- ═══════════════════════════════════════════ -->
+<section>
+  <p>Iframes create a separate document — the shader has to explicitly cross into them.</p>
+
+  <p>srcdoc iframe:</p>
+  <iframe srcdoc="<html><body style='background:#ffe0e0; font-family:monospace; padding:8px;'>
+    <p>Inside srcdoc iframe. Separate document context.</p>
+    <input type='text' value='iframe input'>
+    <input type='color' value='#00ff00'>
+    <input type='range'>
+    <select><option>iframe select</option></select>
+  </body></html>" width="400" height="100" style="border:2px solid #000;"></iframe>
+
+  <p>data: URI iframe:</p>
+  <iframe src="data:text/html,<html><body style='background:%23e0ffe0; font-family:monospace; padding:8px;'><p>data: URI iframe</p><input type='date'><input type='file'></body></html>" width="400" height="80" style="border:2px solid #000;"></iframe>
+
+  <p>about:blank iframe:</p>
+  <iframe id="blankFrame" src="about:blank" width="400" height="60" style="border:2px solid #000;"></iframe>
+  <script>
+    const bf = document.getElementById('blankFrame');
+    bf.onload = () => {
+      try {
+        bf.contentDocument.body.innerHTML = '<p style="font-family:monospace;padding:8px;">Injected into about:blank iframe</p>';
+      } catch(e) {}
+    };
+  </script>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2>16. Contenteditable &amp; Designmode</h2>
+<!-- ═══════════════════════════════════════════ -->
+<section>
+  <p>Editable regions may generate browser-native UI (caret, selection handles, spell-check underlines).</p>
+  <div contenteditable="true" style="border:2px solid #000; padding:8px; min-height:40px; background:#fff;">
+    Edit me. Watch for spellcheck underlines, caret rendering, and selection handles. Misspeled wrods here.
+  </div>
+  <div contenteditable="plaintext-only" style="border:2px solid #666; padding:8px; min-height:40px; background:#fff; margin-top:4px;">
+    plaintext-only contenteditable. No rich formatting.
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2>17. Form Validation UI</h2>
+<!-- ═══════════════════════════════════════════ -->
+<section>
+  <p>Submit the form to trigger native validation bubbles/tooltips — browser-drawn, not DOM.</p>
+  <form onsubmit="return false;" novalidate="false">
+    <label>Required field (leave empty): <input type="text" required></label>
+    <label>Email validation: <input type="email" value="not-an-email"></label>
+    <label>URL validation: <input type="url" value="not-a-url"></label>
+    <label>Pattern (digits only): <input type="text" pattern="\d+" value="abc"></label>
+    <label>Min/Max number: <input type="number" min="10" max="20" value="99"></label>
+    <button type="submit">Trigger Validation Bubbles</button>
+  </form>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2>18. Tooltips (title Attribute)</h2>
+<!-- ═══════════════════════════════════════════ -->
+<section>
+  <p>Native tooltips from the <code>title</code> attribute are OS-rendered.</p>
+  <span title="This tooltip is rendered by the OS, completely outside the DOM/CSS pipeline. The shader cannot touch it." style="text-decoration:underline dotted; cursor:help;">
+    Hover here for a native tooltip
+  </span>
+  <br>
+  <abbr title="Abbreviation tooltip — also OS-rendered">Hover this abbr</abbr>
+  <br>
+  <img src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40'><rect fill='%23ccc' width='40' height='40'/></svg>" title="Image title tooltip" alt="test">
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2>19. Focus Ring / Outline Rendering</h2>
+<!-- ═══════════════════════════════════════════ -->
+<section>
+  <p>Tab through these. Focus rings may be drawn by the compositor, not CSS:</p>
+  <button class="focus-visible-test">Button 1</button>
+  <button class="focus-visible-test">Button 2</button>
+  <a href="#" class="focus-visible-test">Link</a>
+  <input type="text" class="focus-visible-test" value="Tab to me">
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2>20. Fullscreen &amp; ::backdrop</h2>
+<!-- ═══════════════════════════════════════════ -->
+<section>
+  <div id="fullscreenTarget" style="background:#333; color:#fff; padding:20px;">
+    <p>Click the button to go fullscreen. The ::backdrop is compositor-rendered.</p>
+    <button onclick="document.getElementById('fullscreenTarget').requestFullscreen()">Enter Fullscreen</button>
+    <button onclick="document.exitFullscreen()">Exit Fullscreen</button>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2>21. CSS Animations &amp; Transitions</h2>
+<!-- ═══════════════════════════════════════════ -->
+<section>
+  <p>If the shader intercepts computed styles at paint time, animated intermediate values may escape:</p>
+  <style>
+    @keyframes colorCycle {
+      0%   { background: #ff0000; }
+      25%  { background: #00ff00; }
+      50%  { background: #0000ff; }
+      75%  { background: #ffff00; }
+      100% { background: #ff0000; }
+    }
+    .anim-box {
+      width: 80px; height: 40px;
+      animation: colorCycle 4s linear infinite;
+      border: 1px solid #000;
+      display: inline-block;
+      margin: 4px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spin-box {
+      width: 40px; height: 40px; background: #ff6600;
+      animation: spin 2s linear infinite;
+      display: inline-block;
+      margin: 4px;
+    }
+    .transition-box {
+      width: 80px; height: 40px;
+      background: #ff0000;
+      transition: background 2s ease, transform 1s ease;
+      display: inline-block;
+      border: 1px solid #000;
+      margin: 4px;
+      cursor: pointer;
+    }
+    .transition-box:hover { background: #0000ff; transform: scale(1.5); }
+  </style>
+  <div class="anim-box"></div>
+  <div class="spin-box"></div>
+  <div class="transition-box" title="Hover to transition"></div>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2>22. CSS Transforms, Filters &amp; Compositing</h2>
+<!-- ═══════════════════════════════════════════ -->
+<section>
+  <p>GPU-composited layers may bypass the computed-style path:</p>
+  <style>
+    .gpu-layer {
+      display: inline-block; margin: 4px; padding: 8px;
+      border: 1px solid #000; background: #fff;
+    }
+  </style>
+  <div class="gpu-layer" style="transform: translateZ(0);">translateZ(0) — forced GPU layer</div>
+  <div class="gpu-layer" style="will-change: transform;">will-change: transform</div>
+  <div class="gpu-layer" style="filter: blur(1px);">CSS filter: blur(1px)</div>
+  <div class="gpu-layer" style="filter: invert(1);">CSS filter: invert(1)</div>
+  <div class="gpu-layer" style="filter: hue-rotate(90deg);">CSS filter: hue-rotate(90deg)</div>
+  <div class="gpu-layer" style="backdrop-filter: blur(4px); background: rgba(255,255,255,0.5);">backdrop-filter: blur(4px)</div>
+  <div class="gpu-layer" style="mix-blend-mode: multiply; background: #ff0000; color: #fff;">mix-blend-mode: multiply</div>
+  <div class="gpu-layer" style="opacity: 0.5;">opacity: 0.5 (composited)</div>
+  <div class="gpu-layer" style="transform: perspective(200px) rotateY(20deg);">3D perspective transform</div>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2>23. CSS Gradients &amp; Images as Background</h2>
+<!-- ═══════════════════════════════════════════ -->
+<section>
+  <p>If the shader modifies background-color but not background-image:</p>
+  <div style="width:300px; height:40px; background: linear-gradient(to right, #ff0000, #0000ff); border:1px solid #000;"></div>
+  <div style="width:300px; height:40px; background: radial-gradient(circle, #ffff00, #ff00ff); border:1px solid #000; margin-top:4px;"></div>
+  <div style="width:300px; height:40px; background: conic-gradient(#ff0000, #00ff00, #0000ff, #ff0000); border:1px solid #000; margin-top:4px;"></div>
+  <div style="width:300px; height:40px; background: repeating-linear-gradient(45deg, #000 0px, #000 10px, #ff0 10px, #ff0 20px); border:1px solid #000; margin-top:4px;"></div>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2>24. Box Shadows, Text Shadows, Outlines</h2>
+<!-- ═══════════════════════════════════════════ -->
+<section>
+  <p>Shadows and outlines are painted in a separate pass:</p>
+  <div style="display:inline-block; padding:8px; margin:8px; background:#fff; box-shadow: 5px 5px 0 #ff0000, 10px 10px 0 #00ff00, 15px 15px 0 #0000ff;">Box shadows (stacked)</div>
+  <p style="font-size:18px; text-shadow: 2px 2px #ff0000, -2px -2px #0000ff;">Text with multi-color text-shadow</p>
+  <div style="display:inline-block; padding:8px; margin:8px; outline: 4px solid #ff0000; outline-offset: 4px; border: 2px solid #0000ff;">Outline with offset</div>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2>25. Images: img, picture, object, embed</h2>
+<!-- ═══════════════════════════════════════════ -->
+<section>
+  <p>Decoded image pixels aren't in the computed style path:</p>
+  <!-- Inline SVG as img src -->
+  <img src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='50'><rect fill='%23ff6600' width='100' height='50'/><text x='10' y='30' font-size='12' fill='%23fff'>img src</text></svg>" alt="test image">
+
+  <picture>
+    <source media="(min-width:0px)" srcset="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='50'><rect fill='%230066ff' width='100' height='50'/><text x='5' y='30' font-size='12' fill='%23fff'>picture</text></svg>">
+    <img src="" alt="picture element">
+  </picture>
+
+  <object data="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='50'><rect fill='%23009900' width='100' height='50'/><text x='5' y='30' font-size='12' fill='%23fff'>object</text></svg>" type="image/svg+xml" width="100" height="50"></object>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2>26. Drag Ghost Image</h2>
+<!-- ═══════════════════════════════════════════ -->
+<section>
+  <p>The drag ghost is OS-composited, not DOM-rendered:</p>
+  <div draggable="true" style="display:inline-block; padding:12px; background:#ffcc00; border:2px solid #000; cursor:grab;">
+    Drag me — watch the ghost image
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2>27. CSS content Property (Generated Content)</h2>
+<!-- ═══════════════════════════════════════════ -->
+<section>
+  <style>
+    .attr-content::after { content: " [data-info=" attr(data-info) "]"; color: #009900; }
+    .url-content::before {
+      content: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16'><circle cx='8' cy='8' r='7' fill='red'/></svg>");
+      vertical-align: middle;
+      margin-right: 4px;
+    }
+    .quote-content { quotes: '"' '"' "'" "'"; }
+    .quote-content::before { content: open-quote; color: red; font-size: 1.5em; }
+    .quote-content::after { content: close-quote; color: red; font-size: 1.5em; }
+  </style>
+  <p class="attr-content" data-info="hello">Text with attr() generated content:</p>
+  <p class="url-content">Text with url() image in ::before</p>
+  <p class="quote-content">Text with CSS quote marks</p>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2>28. Web Components (Slotted Content)</h2>
+<!-- ═══════════════════════════════════════════ -->
+<section>
+  <template id="card-template">
+    <style>
+      :host {
+        display: block; border: 2px solid #9900cc; padding: 10px; margin: 4px 0;
+        background: #f9f0ff;
+      }
+      ::slotted(span) { color: #cc0000; font-weight: bold; }
+      .internal { color: #006600; font-style: italic; }
+    </style>
+    <p class="internal">Internal shadow content (green italic)</p>
+    <slot></slot>
+  </template>
+  <script>
+    class TestCard extends HTMLElement {
+      constructor() {
+        super();
+        const shadow = this.attachShadow({ mode: 'open' });
+        shadow.append(document.getElementById('card-template').content.cloneNode(true));
+      }
+    }
+    customElements.define('test-card', TestCard);
+  </script>
+  <test-card>
+    <span>Slotted content (should be red bold via ::slotted)</span>
+    <p>Regular slotted paragraph</p>
+  </test-card>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2>29. CSS Containment &amp; Content-Visibility</h2>
+<!-- ═══════════════════════════════════════════ -->
+<section>
+  <p>Elements with containment may skip style recalc in some paths:</p>
+  <div style="contain: strict; width: 300px; height: 60px; border: 1px solid #000; overflow: hidden; padding: 4px;">
+    contain: strict — layout, paint, size containment. Internal styles isolated.
+  </div>
+  <div style="content-visibility: auto; contain-intrinsic-size: 300px 60px; border: 1px solid #000; padding: 4px; margin-top: 4px;">
+    content-visibility: auto — skipped by rendering engine until visible.
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2>30. OffscreenCanvas &amp; Image Bitmap</h2>
+<!-- ═══════════════════════════════════════════ -->
+<section>
+  <canvas id="offscreenTarget" width="300" height="60" style="border:1px solid #000;"></canvas>
+  <script>
+    const oCanvas = document.getElementById('offscreenTarget');
+    if (oCanvas.transferControlToOffscreen) {
+      const offscreen = oCanvas.transferControlToOffscreen();
+      const octx = offscreen.getContext('2d');
+      octx.fillStyle = '#cc00cc';
+      octx.fillRect(0, 0, 300, 60);
+      octx.fillStyle = '#ffffff';
+      octx.font = '14px monospace';
+      octx.fillText('OffscreenCanvas — fully off-DOM', 10, 35);
+    } else {
+      const ctx2 = oCanvas.getContext('2d');
+      ctx2.fillStyle = '#cc00cc';
+      ctx2.fillRect(0, 0, 300, 60);
+      ctx2.fillStyle = '#ffffff';
+      ctx2.font = '14px monospace';
+      ctx2.fillText('OffscreenCanvas not supported', 10, 35);
+    }
+  </script>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2>31. Deprecated / Quirks Elements</h2>
+<!-- ═══════════════════════════════════════════ -->
+<section>
+  <p>Legacy elements that the browser may render through special paths:</p>
+  <marquee behavior="scroll" direction="left" scrollamount="3" style="border:1px solid #000; background:#fff;">
+    &lt;marquee&gt; — browser-animated scrolling text, no CSS animation involved
+  </marquee>
+  <hr style="border:none; border-top:2px solid #ff0000; margin:8px 0;">
+  <p><font color="red" size="5" face="serif">Legacy &lt;font&gt; tag with color/size/face attributes</font></p>
+  <center>Centered via &lt;center&gt; tag</center>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2>32. Printing / @media print</h2>
+<!-- ═══════════════════════════════════════════ -->
+<section>
+  <style>
+    @media print {
+      .print-only { display: block !important; }
+      .screen-only { display: none !important; }
+    }
+    .print-only { display: none; }
+  </style>
+  <p class="screen-only">This is visible on screen. Press Ctrl+P to test print styles.</p>
+  <p class="print-only">THIS TEXT ONLY APPEARS IN PRINT — if the shader operates only at screen paint time, print bypasses it entirely.</p>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2>33. Scroll Snap &amp; Overscroll</h2>
+<!-- ═══════════════════════════════════════════ -->
+<section>
+  <p>Overscroll glow/bounce is compositor-level:</p>
+  <div style="width:300px; height:80px; overflow-y:scroll; scroll-snap-type:y mandatory; border:1px solid #000; overscroll-behavior:contain;">
+    <div style="height:80px; scroll-snap-align:start; background:#ffe0e0; padding:4px;">Snap point 1 (scroll down)</div>
+    <div style="height:80px; scroll-snap-align:start; background:#e0ffe0; padding:4px;">Snap point 2</div>
+    <div style="height:80px; scroll-snap-align:start; background:#e0e0ff; padding:4px;">Snap point 3</div>
+    <div style="height:80px; scroll-snap-align:start; background:#ffe0ff; padding:4px;">Snap point 4</div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2>34. @layer (Cascade Layers)</h2>
+<!-- ═══════════════════════════════════════════ -->
+<section>
+  <style>
+    @layer base, override;
+    @layer base { .layer-test { color: #ff0000; background: #ffe0e0; } }
+    @layer override { .layer-test { color: #0000ff; } }
+  </style>
+  <p class="layer-test">Styled via @layer cascade — does the shader see the resolved value or per-layer?</p>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2>35. Nested Browsing Contexts (object/embed)</h2>
+<!-- ═══════════════════════════════════════════ -->
+<section>
+  <object data="data:text/html,<body style='background:%23ffe;font-family:monospace;padding:8px'><p>HTML inside object tag</p><input type='color' value='%23ff0000'></body>" type="text/html" width="350" height="70" style="border:2px solid #000;"></object>
+  <br>
+  <embed src="data:text/html,<body style='background:%23eff;font-family:monospace;padding:8px'><p>HTML inside embed tag</p></body>" type="text/html" width="350" height="50" style="border:2px solid #000;">
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2>36. Text Decoration &amp; Emphasis</h2>
+<!-- ═══════════════════════════════════════════ -->
+<section>
+  <p>Underlines, overlines, and emphasis marks may be painted separately:</p>
+  <p style="text-decoration: underline wavy #ff0000;">Wavy red underline</p>
+  <p style="text-decoration: line-through double #0000ff;">Double blue strikethrough</p>
+  <p style="text-decoration: overline dotted #009900;">Dotted green overline</p>
+  <p style="text-emphasis: filled circle #ff0000; -webkit-text-emphasis: filled circle #ff0000;">Text emphasis marks (red circles above each character)</p>
+  <p style="text-decoration: underline; text-decoration-skip-ink: auto;">Underline with skip-ink (gaps around descenders like g, y, p)</p>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2>37. Image Rendering Modes</h2>
+<!-- ═══════════════════════════════════════════ -->
+<section>
+  <p>Different rendering modes may use different GPU paths:</p>
+  <style>
+    .render-test {
+      width: 80px; height: 40px; display: inline-block; margin: 4px;
+      background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='4' height='4'><rect fill='%23000' width='2' height='2'/><rect fill='%23fff' x='2' width='2' height='2'/><rect fill='%23fff' y='2' width='2' height='2'/><rect fill='%23000' x='2' y='2' width='2' height='2'/></svg>");
+      background-size: 16px 16px;
+      border: 1px solid #000;
+    }
+  </style>
+  <div class="render-test" style="image-rendering: auto;" title="auto"></div>
+  <div class="render-test" style="image-rendering: pixelated;" title="pixelated"></div>
+  <div class="render-test" style="image-rendering: crisp-edges;" title="crisp-edges"></div>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2>38. Cursor Styles</h2>
+<!-- ═══════════════════════════════════════════ -->
+<section>
+  <p>Custom cursors are OS-rendered:</p>
+  <span style="cursor: crosshair; padding: 4px; border: 1px dashed #000;">crosshair</span>
+  <span style="cursor: wait; padding: 4px; border: 1px dashed #000;">wait</span>
+  <span style="cursor: help; padding: 4px; border: 1px dashed #000;">help</span>
+  <span style="cursor: not-allowed; padding: 4px; border: 1px dashed #000;">not-allowed</span>
+  <span style="cursor: url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2232%22 height=%2232%22><circle cx=%2216%22 cy=%2216%22 r=%2214%22 fill=%22red%22/></svg>') 16 16, auto; padding: 4px; border: 1px dashed #000;">custom SVG cursor</span>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2>39. Spelling &amp; Grammar Decorations</h2>
+<!-- ═══════════════════════════════════════════ -->
+<section>
+  <p>Browser draws squiggly underlines for misspellings — compositor-level:</p>
+  <div contenteditable spellcheck="true" lang="en" style="border:1px solid #000; padding:8px; background:#fff;">
+    Thiss sentance has mispeled wurds to triggr thee spellchek undrlins.
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2>40. Color Scheme &amp; System Colors</h2>
+<!-- ═══════════════════════════════════════════ -->
+<section>
+  <p>Elements using system color keywords pull from the OS theme:</p>
+  <div style="color: CanvasText; background: Canvas; border: 2px solid ButtonBorder; padding: 8px;">
+    System colors: CanvasText on Canvas with ButtonBorder
+  </div>
+  <div style="color-scheme: dark; padding: 8px; border: 1px solid #000; margin-top: 4px;">
+    <input type="text" value="Dark color-scheme input">
+    <input type="checkbox" checked> dark checkbox
+    <select><option>dark select</option></select>
+  </div>
+  <div style="color-scheme: light; padding: 8px; border: 1px solid #000; margin-top: 4px;">
+    <input type="text" value="Light color-scheme input">
+    <input type="checkbox" checked> light checkbox
+    <select><option>light select</option></select>
+  </div>
+</section>
+
+</body>
+</html>

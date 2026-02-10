@@ -1,0 +1,622 @@
+<!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml"><head><title>
+
+</title>
+     <script language="javascript" type="text/javascript">
+
+        var bursary_length = 8;
+
+                function limitText(limitField, limitCount, limitNum) {
+                        if (limitField.value.length > limitNum) {
+                                limitField.value = limitField.value.substring(0, limitNum);
+                        } else {
+                                limitCount.value = limitNum - limitField.value.length;
+                        }
+         }
+
+
+        
+         </script>    
+  <link href="/css/reset.css" media="all" rel="stylesheet" type="text/css"><link href="/css/default_style.css" media="all" rel="stylesheet" type="text/css">
+
+	<script src="/js/jquery.js"></script><script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js"></script>
+
+<script type="text/javascript">//<![CDATA[
+//]]>
+</script>
+   
+    </head>
+    	
+<body>
+  
+    <header id="header" role="header" style="transform: translateY(0px);">
+	<div class="boxed">
+	<nav class="top-bar" role="navigation">
+		<ul class="title-area">
+			<li class="name">
+				<div class="logo">
+					<img src="/img/vic_crest.png" alt="Victoria College">
+				</div>
+			</li>
+		</ul>
+	</nav>
+	</div>
+</header>
+    <div id="content">
+    <div class="container">
+
+       
+			<div id="fontsize">
+</div>				
+
+    <form method="post" action="./vicone.aspx" onsubmit="javascript:return WebForm_OnSubmit();" id="form1" enctype="multipart/form-data">
+<div class="aspNetHidden">
+<input type="hidden" name="__EVENTTARGET" id="__EVENTTARGET" value="">
+<input type="hidden" name="__EVENTARGUMENT" id="__EVENTARGUMENT" value="">
+<input type="hidden" name="__LASTFOCUS" id="__LASTFOCUS" value="">
+<input type="hidden" name="__VIEWSTATE" id="__VIEWSTATE" value="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">
+</div>
+
+<script type="text/javascript">
+//<![CDATA[
+var theForm = document.forms['form1'];
+if (!theForm) {
+    theForm = document.form1;
+}
+function __doPostBack(eventTarget, eventArgument) {
+    if (!theForm.onsubmit || (theForm.onsubmit() != false)) {
+        theForm.__EVENTTARGET.value = eventTarget;
+        theForm.__EVENTARGUMENT.value = eventArgument;
+        theForm.submit();
+    }
+}
+//]]>
+</script>
+
+
+<script src="/WebResource.axd?d=pynGkmcFUV13He1Qd6_TZABD4LpopLx7-KvChQFm6NxRVpsSLqkNd4Mgw6r6FiftSovUNuFmhSN6GIH7eBHLSg2&amp;t=638464911187615987" type="text/javascript"></script>
+
+
+<script src="/ScriptResource.axd?d=1HpV3OVB0CaEXoaafcqmhpoi8Z44HNAawAbdpjuWtIH48t59f5kZE5Zl3r4Z3uh1ZsHfXecp_WhUuKkqRowt0gopue_P4qoFFSM9xeKFDKVQ4_xXrTKVRD6_NpPRyD129EBVT072tvfg-8ABqJoHeg2&amp;t=7e969891" type="text/javascript"></script>
+<script src="../Scripts/WebForms/MsAjax/MicrosoftAjax.js" type="text/javascript"></script>
+<script src="../Scripts/WebForms/MsAjax/MicrosoftAjaxWebForms.js" type="text/javascript"></script>
+<script type="text/javascript">
+//<![CDATA[
+function WebForm_OnSubmit() {
+if (typeof(ValidatorOnSubmit) == "function" && ValidatorOnSubmit() == false) return false;
+return true;
+}
+//]]>
+</script>
+
+<div class="aspNetHidden">
+
+	<input type="hidden" name="__VIEWSTATEGENERATOR" id="__VIEWSTATEGENERATOR" value="D2D7C7B0">
+	<input type="hidden" name="__SCROLLPOSITIONX" id="__SCROLLPOSITIONX" value="0">
+	<input type="hidden" name="__SCROLLPOSITIONY" id="__SCROLLPOSITIONY" value="0">
+	<input type="hidden" name="__EVENTVALIDATION" id="__EVENTVALIDATION" value="tcZApKfen2y+8sgpuVYgd4HF661fenAis7VNXGc9F0CCSp1c5jEprnPayA7fgkwrUAhQxdBvzPwDGbSfnnzHbtEoxb/ltwjUa7OYL3zgQ02vSLYbxq9YS6PlUiicoepb6l2gQ311mFNn3GWECCCwcuSbrI8/kBBLHRmmoUtBuZH3eQLnbbAWnXxT0yQQ+MDbU40fw4gs1kOeek5hB5Yz/pqPUgPdAzo+0G4dmZvQamYrpvFEnrhGPHnQ95i26Jbltwd/0f7Dg7eBuZCL6XpOulNPOWLCRfwvnbGk3044GOKvbIeDWUWC57e9+wIvTC1iWl7w2VNbv0A5JyyFoxzCsBWS7GQ7gNl4x/haE9Pu+u8jo4EM/f98eC+xyvfKTNuDV2FO6RVp68Oiut044KGtv8ducT5BKuqqwB4qErC2hSk15dnM32GIzQhRXeWJeAWEwfjS6iPyuIebkodrFTXWtQL6zSoPgz2JqOfrGs2wRpS/Mca8OsbreYbRCR426l5L8+oEmI9eihCvgj0eME8B6L89GQEVi0tlHe5PuV6cG0loDuwX6KcgV1FfjASnaXCvsnAacHFxuKAScPiVO26CP2Db5/M/Juq9PinYLZut0jw4AZb6GI/PHFborCi78LqleDOrQzwZsc+XXtDmIwl4pflCeCBhBq6dxg92wLHeyo64eSvyIcxpzLPxlhdIFK/tTEjP9HPgJh/V1q9zSAKsPcBGJZ6FBWnbJDejrkCDHoXr+G7KetaEHXmpEaXhElL+bgEBtseHuR+EwAZtX+sC6Sb8J96utiFdfZ+aCqAuUIK6ztPyFGcY+XNuMQ4SKYxQg73DYg4tCNWRI5+CFeDabTd1gdaFzFx6E1Kb1RnO0tAc/HfSs6tc3B/1wiZjVto+0RPUpZIhxIMYyHn688Qd8Q==">
+</div>
+           <div class="standard">
+						<fieldset>
+							
+								<div class="intro">
+									 <h1 class="capitalize">Vic One  Student Application</h1>
+								</div>
+                            </fieldset>
+               </div>
+     
+                 <script type="text/javascript">
+//<![CDATA[
+Sys.WebForms.PageRequestManager._initialize('ctl04', 'form1', [], [], [], 90, '');
+//]]>
+</script>
+
+                
+      
+        		<div class="standard">
+						<fieldset>
+							<div class="h2-banner">
+								<h2>Welcome</h2>
+							</div>
+							
+							
+							<div class="single-field">
+								<fieldset>
+                                <span id="lblUsername">Linero, Aurelio</span>
+                                    <br>
+                                <span id="lblEmail">alinerob31@gmail.com</span>    
+			</fieldset>
+							</div>
+						</fieldset>
+					</div>
+                <div class="standard">
+                    
+                   <br> 
+
+                    <div id="pnlStreams">
+	
+						<fieldset>
+							
+								<div class="h2-banner">
+									<h2>
+                                        Streams Ranking</h2>
+								</div>
+				                                                     
+							    
+&nbsp;&nbsp;
+                                <br>
+                                <span id="Label2">We are accepting applications for:</span>
+&nbsp;
+                              <span id="lblAllStreams" style="font-weight:normal;">Chambers, Education, Frye, Gooch, Jewison, Pearson, Schawlow, Stowe-Gullen</span>
+                            <br>
+                             <span id="Label1">Please choose your top streams from this list. You must select at least 2 streams.</span>
+                         <br>			
+
+
+								<br>
+                        <table>
+                            <tbody><tr>
+                                <td>
+                                    <table>
+ <tbody><tr>
+                    <td>
+                        <span id="lblRank1" style="display:inline-block;width:200px;">Rank 1: *</span>
+                    </td>
+                    <td><select name="ddlRank1" onchange="javascript:setTimeout('__doPostBack(\'ddlRank1\',\'\')', 0)" id="ddlRank1" style="width:200px;">
+		<option value="0"></option>
+		<option selected="selected" value="20">Chambers</option>
+		<option value="4">Education</option>
+		<option value="2">Frye</option>
+		<option value="18">Gooch</option>
+		<option value="16">Jewison</option>
+		<option value="3">Pearson</option>
+		<option value="17">Schawlow</option>
+		<option value="5">Stowe-Gullen</option>
+
+	</select><br>
+                       <span id="rfvddlRank1" style="color:Red;visibility:hidden;">Please select first rank stream</span>
+                    </td>
+    
+                 <td rowspan="4" style="vertical-align:top">
+                      <span id="lblScienceStudentMessage" style="display:inline-block;width:300px;"></span>
+                     <br>
+                      <span id="lblInterviewMessage" style="display:inline-block;color:Red;width:300px;">Please note that shortlisted candidates for streams Chambers and Stowe-Gullen will be contacted to arrange a virtual interview (details to follow by email after submission).</span>
+                 </td>
+                </tr>
+                <tr>
+                    <td>
+                        <span id="lblRank2" style="display:inline-block;width:200px;">Rank 2: *</span>
+                    </td>
+                                           
+                    <td><select name="ddlRank2" onchange="javascript:setTimeout('__doPostBack(\'ddlRank2\',\'\')', 0)" id="ddlRank2" style="width:200px;">
+		<option value="0"></option>
+		<option value="4">Education</option>
+		<option value="2">Frye</option>
+		<option value="18">Gooch</option>
+		<option value="16">Jewison</option>
+		<option value="3">Pearson</option>
+		<option selected="selected" value="17">Schawlow</option>
+		<option value="5">Stowe-Gullen</option>
+
+	</select><br>
+                        <span id="rfvddlRank2" style="color:Red;visibility:hidden;">Please select second rank stream</span>
+                    </td>
+
+                </tr>
+                <tr>
+                    <td>
+                        <span id="lblRank3" style="display:inline-block;width:200px;">Rank 3: </span>
+                    </td>
+                    <td><select name="ddlRank3" onchange="javascript:setTimeout('__doPostBack(\'ddlRank3\',\'\')', 0)" id="ddlRank3" style="width:200px;">
+		<option value="0"></option>
+		<option value="4">Education</option>
+		<option value="2">Frye</option>
+		<option selected="selected" value="18">Gooch</option>
+		<option value="16">Jewison</option>
+		<option value="3">Pearson</option>
+		<option value="5">Stowe-Gullen</option>
+
+	</select><br>
+                  <span id="rfvddlRank3" style="color:Red;visibility:hidden;">Please select third rank stream</span>
+                    </td>
+                </tr>
+                <tr>
+                                        
+                   <td colspan="2" align="center">
+                      <input type="submit" name="btnShow" value="Submit Choices" id="btnShow" disabled="disabled" class="aspNetDisabled">  
+                    </td>
+                    
+                </tr>
+                                    </tbody></table>
+                                </td>
+                             
+                            </tr>
+               
+            </tbody></table>
+
+
+						</fieldset>
+
+                    
+</div>
+ </div>  
+                <div class="standard">
+                 <div id="pnlQuestions" style="width:100%;">
+	
+                 <fieldset>
+                                <div class="h2-banner">
+									<h2>
+                                        Questions</h2>
+								</div> 
+                     <div>
+                     <p>
+                   <strong>Answer the following questions in a well-formed short essay of approximately 250 words (2000 characters).</strong>
+								</p>
+                          
+                                <p>
+                                    &nbsp;</p>
+                          
+                               
+                            <span id="lblQ1"><strong>1. </strong>Please respond to <strong>either</strong> question A <strong>or</strong> question B:<br> <br>    A. List three regular activities, at least one of which took place outside of your school, that you have enjoyed in the past two years.<br>  <br>   B. Tell us about a challenging situation or circumstance that you’ve experienced. How do you believe this challenge impacted you?</span>
+										
+                                  <br>                                               
+                                <textarea name="txtQ1A" rows="2" cols="20" id="txtQ1A" class="textareaLarge" onkeydown="limitText(this.form.txtQ1A,this.form.txtQ1A_count,2000);" onkeyup="limitText(this.form.txtQ1A,this.form.txtQ1A_count,2000);" style="height:129px;width:98%;">Question chosen: B.
+Five months ago I took one of the hardest decisions of my life: decline my U of T offer and hope my deferral application was accepted. Even though I had a guaranteed spot in one of my dream universities, I walked away from it to bet on myself.
+
+Controversial falls short as an adjective to describe this decision. My family, friends, and mentor all advised against it. And why shouldn't they? I had poured hundreds of hours into the opposite direction. And yet, I had a burning desire I wanted to protect: to build something truly my own.
+
+By the end of high school, I'd already started building a startup. My project had paying users, I'd gotten accepted into a startup accelerator, and for the first time in my life the thing I'd been building actually felt real. But I couldn't do both. Running a startup demands all of you, and so does first year at U of T. I had to pick one.
+
+After weeks of thought, I picked my startup. But now that I'd staked part of my future on it, I had to prove to myself and everyone else that it was worth it.
+
+For months, I spent every waking moment on my project. I wrote the code, made the ads, talked to users, and learned how to lead a team through uncertainty. But there was only so much I could do. My inexperience led me to burn through money too quickly, killing our runway.
+
+Papyric ended up the same way most startups do: it died. But that doesn't mean it failed. I walked away knowing how to build a product from nothing, how to sell something I believe in, and how to pick myself back up when the thing I built doesn't make it. Knowing that I can give it my all, not make it, and still come out standing has changed my relationship with failure.
+
+I'm not the same person who applied to Vic One a year ago. I'm walking into university having already bet on myself, knowing I'd do it again.</textarea>  
+                      <span id="Label3" style="font-size:Smaller;font-style:italic;">Characters left:</span><input name="txtQ1A_count" type="text" value="135" readonly="readonly" id="txtQ1A_count" size="3">
+                     <span id="RegularExpressionValidator4" style="color:Red;display:none;">First Question Minimum 50 and Maximum 2,000 characters required.</span>
+                     <br>
+                                    <span id="RequiredFieldValidator3" style="color:Red;visibility:hidden;">Please answer first question</span>
+                                    
+                                   <br>
+                     <br>
+                                
+                                  <br>       
+                            <div class="single-field new-line">
+                                <span id="lblQ2"><strong>2. </strong>How did you hear about Vic One? Why did you apply to your first choice stream?</span>
+							</div>						
+                              
+                                <textarea name="txtQ2A" rows="2" cols="20" id="txtQ2A" class="textareaLarge" onkeydown="limitText(this.form.txtQ2A,this.form.txtQ2A_count,2000);" onkeyup="limitText(this.form.txtQ2A,this.form.txtQ2A_count,2000);" style="height:129px;width:98%;">I initally heard about Vic One through my U of T application. But after deferring, it kept popping up. The friends I have over at U of T talked to me about it extensively and told me that I'd fit right into the program. Then, during my Victoria College tour, it was brought up as one of the main talking points. The more I heard about it, the more it felt like something I had to be a part of.
+
+I picked Chambers as my preferred stream because it aligns with a side of me that my studies don't capture. I'll be studying mathematics and physics, and I'll get no shortage of rigorous, technical material through my coursework. But as someone who has led teams, built and run a startup, and competed in public speaking nationally, I can't help but feel like Chambers is the right space to develop the other half of my abilities. I'm incredibly interested in leadership, public policy, and ethical decision-making, and feel that combining this with my technical abilities is the right call.
+
+After spending my gap year leading a startup through an accelerator and through failure, I want to keep sharpening the abilities that I developed during that experience in a more structured, intellectual environment. Chambers feels like exactly that.</textarea>  
+                                <span id="Label4" style="font-size:Smaller;font-style:italic;">Characters left:</span><input name="txtQ2A_count" type="text" value="758" readonly="readonly" id="txtQ2A_count" size="3">
+                                <span id="RegularExpressionValidator1" style="color:Red;display:none;">Second Question Minimum 50 and Maximum 2,000 characters required.</span>
+           
+                                    <br>
+
+                                    <span id="RequiredFieldValidator2" style="color:Red;visibility:hidden;">Please answer second question</span>
+                                          
+                                                           
+							
+
+                            <div class="single-field new-line">
+                                <span id="lblQ3"><strong>3. </strong>To what extent should greed be regulated?</span>
+								</div>	
+								
+                                <textarea name="txtQ3A" rows="2" cols="20" id="txtQ3A" class="textareaLarge" onkeydown="limitText(this.form.txtQ3A,this.form.txtQ3A_count,2000);" onkeyup="limitText(this.form.txtQ3A,this.form.txtQ3A_count,2000);" style="height:129px;width:98%;">Greed shouldn't be regulated. Instead, social systems must be engineered to not reward it.
+
+I believe all social systems have an "optimizer": the main driver behind the actions of people, corporations, and other entities within that system. In capitalism, for example, that optimizer is the acquisition of capital.
+
+Greed arises not as an evil, but as a logical solution to this optimizer. It is the path of least resistance. The problem lies in the fact that actions that actively worsen the wellbeing of others, the environment, or integrity of the system work incredibly well to fulfill the principles of our society.
+
+Monopolies exist not because there are evil people in the world, but because they're a great solution to the problem of acquiring capital. Trying to regulate greed when the foundations of our system call for it is hopeless because it leads to a cat-and-mouse problem. If we ban monopolies then companies can lobby for regulatory capture; if we outlaw damaging the environment companies can offshore their pollution. Greed adapts at an incredible pace. Lawmakers simply can't hope to cover every possible scenario. 
+
+The solution? Don't let greed be an answer to the core principles of our society. A system that optimizes purely for capital will inevitably reward those willing to exploit others to get it. No amount of regulation changes that. The real solution is to design systems whose optimizer inherently accounts for the wellbeing of the people within it, where the path of least resistance isn't exploitation, but contribution.
+
+I don't pretend to know what that system looks like, but I do know this: as someone who builds systems, when the output is wrong, you don't keep patching it. You go back and fix the design.</textarea>  
+                      <span id="Label5" style="font-size:Smaller;font-style:italic;">Characters left:</span><input name="txtQ3A_count" type="text" value="242" readonly="readonly" id="txtQ3A_count" size="3">
+                      <span id="RegularExpressionValidator2" style="color:Red;display:none;">Third Question Minimum 50 and Maximum 2,000 characters required.</span>
+
+                     <br>
+                                    <span id="RequiredFieldValidator1" style="color:Red;visibility:hidden;">Please answer third question</span>
+                                          <br>
+                           
+                      <br>
+						</div>				
+
+                           
+                           
+
+                        <table id="tblSubmitted" border="1" width="100%">
+		<tbody><tr>
+			<td colspan="3">
+
+                                    <div>
+                                        <p>
+                                            <strong>By typing my name in the field below, I affirm that the content of this application is entirely my own work, and all information provided is presented in my own words without the assistance of other people or of AI technology.</strong>
+                                        </p>
+                                        <p>
+                                            &nbsp;</p>
+                                        <input name="txtFullName" type="text" value="Aurelio Linero" maxlength="100" id="txtFullName" style="width:300px;">
+                                        <span id="rfvtxtFullName" style="color:Red;visibility:hidden;">Please enter your name.</span>
+                                    </div>
+
+                                </td>
+		</tr>
+		<tr id="trSave">
+			<td> &nbsp;&nbsp;&nbsp;</td>
+			<td style="padding:10px; vertical-align:top;">
+                            <input type="submit" name="btnSave" value="Save Application" id="btnSave" style="font-weight:bold;">
+                            <br>
+                                             
+                        </td>
+			<td style="padding:10px; vertical-align:top;">
+                                 <span id="Label7" style="font-weight:bold;">Save:</span>
+                                 <span id="lblSave2">Allows you to save your responses and edit your application at a later time.</span></td>
+		</tr>
+		<tr id="trUpload">
+			<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+			<td style="border: 1px solid black; padding: 10px;">
+                                           
+                                            <br>  
+                                           <input type="file" name="FileUpload1" id="FileUpload1">
+                                            <br>
+                                           <input type="submit" name="btnUpload" value="Upload Transcript" id="btnUpload" style="font-weight:bold;"> 
+                                           <br><span id="Label10" style="color:Red;font-size:XX-Small;">(only 2MB PDF/JPG/PNG allowed)</span>
+                                            <br>
+                                           <span id="lblLoadFileMessage"></span>
+
+                                               
+                                           
+                                            
+ 
+                                        </td>
+			<td style="padding:10px; vertical-align:top;">
+                                            <span id="Label8" style="font-weight:bold;">Upload:</span>
+                                            <span id="lblUpload2">Allows you to upload one copy of your transcript before proceeding to submit an application. </span>
+                                            <br><span id="lblUploadedTranscript" style="color:Green;font-size:XX-Small;"></span>
+
+                                           
+                                        </td>
+		</tr>
+		<tr id="trSubmit">
+			<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+			<td style="padding:10px; vertical-align:top;">
+                                                <input type="submit" name="btnSubmit" value="Submit Application" onclick="javascript:WebForm_DoPostBackWithOptions(new WebForm_PostBackOptions(&quot;btnSubmit&quot;, &quot;&quot;, true, &quot;viconeregistration&quot;, &quot;&quot;, false, false))" id="btnSubmit" style="font-weight:bold;">
+                                                               
+   
+
+                                            
+                                            </td>
+			<td style="padding:10px; vertical-align:top;">
+                                            <span id="Label9" style="font-weight:bold;">Submit:</span>
+&nbsp;<span id="lblSubmit2">Allows you to submit your application; once submitted you will not be able to edit your application at a later time. </span>
+                                        </td>
+		</tr>
+		<tr>
+			<td colspan="3"><br></td>
+		</tr>
+		<tr>
+			<td colspan="3" align="center"><span id="lblSaveMessage" style="color:Red;font-size:Medium;font-weight:normal;"></span>
+                                    
+                                    
+                                </td>
+		</tr>
+		<tr>
+			<td colspan="3"><br></td>
+		</tr>
+	</tbody></table>
+	
+                     
+                            </fieldset>
+                  
+</div>     
+                  </div>         
+
+								
+    
+<script type="text/javascript">
+//<![CDATA[
+var Page_Validators =  new Array(document.getElementById("rfvddlRank1"), document.getElementById("rfvddlRank2"), document.getElementById("rfvddlRank3"), document.getElementById("RegularExpressionValidator4"), document.getElementById("RequiredFieldValidator3"), document.getElementById("RegularExpressionValidator1"), document.getElementById("RequiredFieldValidator2"), document.getElementById("RegularExpressionValidator2"), document.getElementById("RequiredFieldValidator1"), document.getElementById("rfvtxtFullName"));
+//]]>
+</script>
+
+<script type="text/javascript">
+//<![CDATA[
+var rfvddlRank1 = document.all ? document.all["rfvddlRank1"] : document.getElementById("rfvddlRank1");
+rfvddlRank1.controltovalidate = "ddlRank1";
+rfvddlRank1.errormessage = "Please select first rank stream";
+rfvddlRank1.validationGroup = "viconeregistration";
+rfvddlRank1.evaluationfunction = "RequiredFieldValidatorEvaluateIsValid";
+rfvddlRank1.initialvalue = " 0";
+var rfvddlRank2 = document.all ? document.all["rfvddlRank2"] : document.getElementById("rfvddlRank2");
+rfvddlRank2.controltovalidate = "ddlRank2";
+rfvddlRank2.errormessage = "Please select second rank stream";
+rfvddlRank2.validationGroup = "viconeregistration";
+rfvddlRank2.evaluationfunction = "RequiredFieldValidatorEvaluateIsValid";
+rfvddlRank2.initialvalue = " 0";
+var rfvddlRank3 = document.all ? document.all["rfvddlRank3"] : document.getElementById("rfvddlRank3");
+rfvddlRank3.controltovalidate = "ddlRank3";
+rfvddlRank3.errormessage = "Please select third rank stream";
+rfvddlRank3.enabled = "False";
+rfvddlRank3.validationGroup = "viconeregistration";
+rfvddlRank3.evaluationfunction = "RequiredFieldValidatorEvaluateIsValid";
+rfvddlRank3.initialvalue = " 0";
+var RegularExpressionValidator4 = document.all ? document.all["RegularExpressionValidator4"] : document.getElementById("RegularExpressionValidator4");
+RegularExpressionValidator4.controltovalidate = "txtQ1A";
+RegularExpressionValidator4.errormessage = "First Question Minimum 50 and Maximum 2,000 characters required.";
+RegularExpressionValidator4.display = "Dynamic";
+RegularExpressionValidator4.validationGroup = "viconeregistration";
+RegularExpressionValidator4.evaluationfunction = "RegularExpressionValidatorEvaluateIsValid";
+RegularExpressionValidator4.validationexpression = "^[\\s\\S]{50,2200}$";
+var RequiredFieldValidator3 = document.all ? document.all["RequiredFieldValidator3"] : document.getElementById("RequiredFieldValidator3");
+RequiredFieldValidator3.controltovalidate = "txtQ1A";
+RequiredFieldValidator3.errormessage = "Please answer first question";
+RequiredFieldValidator3.validationGroup = "viconeregistration";
+RequiredFieldValidator3.evaluationfunction = "RequiredFieldValidatorEvaluateIsValid";
+RequiredFieldValidator3.initialvalue = "";
+var RegularExpressionValidator1 = document.all ? document.all["RegularExpressionValidator1"] : document.getElementById("RegularExpressionValidator1");
+RegularExpressionValidator1.controltovalidate = "txtQ2A";
+RegularExpressionValidator1.errormessage = "Second Question Minimum 50 and Maximum 2,000 characters required.";
+RegularExpressionValidator1.display = "Dynamic";
+RegularExpressionValidator1.validationGroup = "viconeregistration";
+RegularExpressionValidator1.evaluationfunction = "RegularExpressionValidatorEvaluateIsValid";
+RegularExpressionValidator1.validationexpression = "^[\\s\\S]{50,2200}$";
+var RequiredFieldValidator2 = document.all ? document.all["RequiredFieldValidator2"] : document.getElementById("RequiredFieldValidator2");
+RequiredFieldValidator2.controltovalidate = "txtQ2A";
+RequiredFieldValidator2.errormessage = "Please answer second question";
+RequiredFieldValidator2.validationGroup = "viconeregistration";
+RequiredFieldValidator2.evaluationfunction = "RequiredFieldValidatorEvaluateIsValid";
+RequiredFieldValidator2.initialvalue = "";
+var RegularExpressionValidator2 = document.all ? document.all["RegularExpressionValidator2"] : document.getElementById("RegularExpressionValidator2");
+RegularExpressionValidator2.controltovalidate = "txtQ3A";
+RegularExpressionValidator2.errormessage = "Third Question Minimum 50 and Maximum 2,000 characters required.";
+RegularExpressionValidator2.display = "Dynamic";
+RegularExpressionValidator2.validationGroup = "viconeregistration";
+RegularExpressionValidator2.evaluationfunction = "RegularExpressionValidatorEvaluateIsValid";
+RegularExpressionValidator2.validationexpression = "^[\\s\\S]{50,2200}$";
+var RequiredFieldValidator1 = document.all ? document.all["RequiredFieldValidator1"] : document.getElementById("RequiredFieldValidator1");
+RequiredFieldValidator1.controltovalidate = "txtQ3A";
+RequiredFieldValidator1.errormessage = "Please answer third question";
+RequiredFieldValidator1.validationGroup = "viconeregistration";
+RequiredFieldValidator1.evaluationfunction = "RequiredFieldValidatorEvaluateIsValid";
+RequiredFieldValidator1.initialvalue = "";
+var rfvtxtFullName = document.all ? document.all["rfvtxtFullName"] : document.getElementById("rfvtxtFullName");
+rfvtxtFullName.controltovalidate = "txtFullName";
+rfvtxtFullName.errormessage = "Please enter your name.";
+rfvtxtFullName.validationGroup = "viconeregistration";
+rfvtxtFullName.evaluationfunction = "RequiredFieldValidatorEvaluateIsValid";
+rfvtxtFullName.initialvalue = "";
+//]]>
+</script>
+
+
+<script type="text/javascript">
+//<![CDATA[
+
+var Page_ValidationActive = false;
+if (typeof(ValidatorOnLoad) == "function") {
+    ValidatorOnLoad();
+}
+
+function ValidatorOnSubmit() {
+    if (Page_ValidationActive) {
+        return ValidatorCommonOnSubmit();
+    }
+    else {
+        return true;
+    }
+}
+        
+theForm.oldSubmit = theForm.submit;
+theForm.submit = WebForm_SaveScrollPositionSubmit;
+
+theForm.oldOnSubmit = theForm.onsubmit;
+theForm.onsubmit = WebForm_SaveScrollPositionOnSubmit;
+
+document.getElementById('rfvddlRank1').dispose = function() {
+    Array.remove(Page_Validators, document.getElementById('rfvddlRank1'));
+}
+
+document.getElementById('rfvddlRank2').dispose = function() {
+    Array.remove(Page_Validators, document.getElementById('rfvddlRank2'));
+}
+
+document.getElementById('rfvddlRank3').dispose = function() {
+    Array.remove(Page_Validators, document.getElementById('rfvddlRank3'));
+}
+
+document.getElementById('RegularExpressionValidator4').dispose = function() {
+    Array.remove(Page_Validators, document.getElementById('RegularExpressionValidator4'));
+}
+
+document.getElementById('RequiredFieldValidator3').dispose = function() {
+    Array.remove(Page_Validators, document.getElementById('RequiredFieldValidator3'));
+}
+
+document.getElementById('RegularExpressionValidator1').dispose = function() {
+    Array.remove(Page_Validators, document.getElementById('RegularExpressionValidator1'));
+}
+
+document.getElementById('RequiredFieldValidator2').dispose = function() {
+    Array.remove(Page_Validators, document.getElementById('RequiredFieldValidator2'));
+}
+
+document.getElementById('RegularExpressionValidator2').dispose = function() {
+    Array.remove(Page_Validators, document.getElementById('RegularExpressionValidator2'));
+}
+
+document.getElementById('RequiredFieldValidator1').dispose = function() {
+    Array.remove(Page_Validators, document.getElementById('RequiredFieldValidator1'));
+}
+
+document.getElementById('rfvtxtFullName').dispose = function() {
+    Array.remove(Page_Validators, document.getElementById('rfvtxtFullName'));
+}
+//]]>
+</script>
+<input type="hidden" name="__ncforminfo" value="lnYuHG3hSpZzhjiS4a1FByu353HrRzPsfyt8QQefhkbASjIH8xvcEsT3WTjfPJ7pjNPSekCCTroVC7vMOiHyjGxPMhEBFmGvv-lqNpQX8pdfNhGadvsrKKFzGmfVOTKWU3JeNM_i0jT9XkbwrjScSzCk7CviIuN1auO9hKOvOik="></form>
+
+    </div>
+    </div>
+  <div id="footer">
+	<div class="boxed">
+	<p>
+		<a>Contact Us:Victoria College, 73 Queen's Park Crescent, Toronto, Ontario, M5S 1K7 |
+		</a><a href="aps.google.ca/maps?f=q&amp;source=s_q&amp;h1=en&amp;geocode=&amp;q=73+Queen%27s+Park+Crescent,+Toronto,+Ontario,+M5S+1K7&amp;s11=49.891235,-97.15369&amp;sspn=69.799265,79.013672&amp;ie=UTF8&amp;hq=&amp;hnear=73+Queens+Park+Crescent+E,+Toronto,+Toronto+Division,+Ontario&amp;t=h&amp;z=17" target="_blank">Map to Victoria College</a>
+		
+		<br>
+		For questions regarding theVic One Application :
+		<a id="hypContact" href="mailto:vic.one@utoronto.ca?subject=Victoria College Application Manager: Questions">vic.one@utoronto.ca</a>
+	</p>
+	<p>
+		© Victoria College. All rights reserved.
+	</p>
+	<a id="hypLogo" class="vicc_logo" href="http://www.vicu.utoronto.ca/" target="_blank">
+		<img id="imgLogo" src="/img/vicc.gif" alt="Victoria College Logo">
+	</a>
+	</div>
+</div>
+
+<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.14/themes/base/jquery-ui.css" type="text/css" media="all">
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.9/jquery-ui.js"></script>
+
+
+   
+
+</body><style>::selection {
+  background-color: #4f5258 !important;
+}
+
+::-webkit-scrollbar {
+  background: #00050f !important;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #00050f !important;
+  border: 1px solid #1d9bf0 !important;
+  border-radius: 0 !important;
+}
+
+::-webkit-scrollbar-track {
+  background: #00050f !important;
+  border-radius: 0 !important;
+}
+
+::-webkit-scrollbar-track-piece {
+  background: #00050f !important;
+  border-radius: 0 !important;
+}
+
+::-webkit-scrollbar-corner {
+  background: #00050f !important;
+}
+
+::-webkit-scrollbar-button {
+  background: #00050f !important;
+  border-radius: 0 !important;
+}
+</style></html>

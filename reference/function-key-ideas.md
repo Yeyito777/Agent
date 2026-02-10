@@ -8,7 +8,7 @@ All F1-F12 keys are currently unbound. F13 is already bound to keyboard lock.
 |-----|--------|--------|-------|
 | **F1** | Screen record toggle | Needs script | Press to start recording, press again to stop and upload to YT |
 | **F2** | Whisper transcription (hold) | Needs whisperflow setup | Hold to dictate, release to get text pasted |
-| **F3** | Agent voice input (hold) | Needs script | Hold to speak a command to Kit/claude code wrapper |
+| **F3** | Agent voice input (hold) | Needs script | Hold to speak a command to Agent/claude code wrapper |
 | **F4** | Toggle floating | Ready | Was previously on Alt+Shift+Space (commented out) |
 | **F5** | Monocle toggle | Ready | Fullscreen-ish single window layout |
 | **F6** | Dictionary on selection | Needs script | Select a word, hit F6, get definition via notification |
@@ -17,7 +17,7 @@ All F1-F12 keys are currently unbound. F13 is already bound to keyboard lock.
 | **F9** | Quick scratchpad | Ready | dmenu prompt that appends to a scratchpad file |
 | **F10** | System monitor popup | Ready | Float an `st -e htop` |
 | **F11** | Fullscreen toggle | Ready | Traditional fullscreen, apps expect this keysym |
-| **F12** | Spawn Kit | Ready | Quick access, frees Alt+Shift+L for reuse |
+| **F12** | Spawn Agent | Ready | Quick access, frees Alt+Shift+L for reuse |
 
 ## Related todo items
 - F1 recording idea: todo line 27

@@ -9,12 +9,22 @@ Inspecting Claude Code's bundled binary for source code and config validation (s
 An ELF executable — a Node.js app bundled into a single binary (likely via `pkg` or `bun compile`). The JavaScript source is **minified but not encrypted**, so it's fully readable via `strings`.
 
 # How to Inspect
-```bash
-# Extract all readable strings
-strings "$(readlink -f "$(which claude)")" | grep "SEARCH_TERM"
 
-# Get surrounding context (200 chars each side)
-strings "$(readlink -f "$(which claude)")" | grep -oP '.{0,200}SEARCH_TERM.{0,200}'
+**WARNING: Never pipe `strings` on the binary directly in a Bash tool call.** The binary is 80-150+ MB of mostly printable content (minified JS). Piping `strings` through `grep` produces a massive stdout stream that starves Claude Code's single-threaded Node.js event loop — the Ink/React TUI freezes, CPU pegs one core (~11%), and the app crashes. Always dump to a temp file first and search that:
+
+```bash
+# SAFE: dump to file first, then search
+strings "$(readlink -f "$(which claude)")" > /tmp/claude_strings.txt
+grep "SEARCH_TERM" /tmp/claude_strings.txt
+
+# SAFE: surrounding context
+grep -oP '.{0,200}SEARCH_TERM.{0,200}' /tmp/claude_strings.txt
+```
+
+**Never do this** (will crash Claude Code):
+```bash
+# UNSAFE: massive pipe floods the event loop
+strings "$(readlink -f "$(which claude)")" | grep "SEARCH_TERM"
 ```
 
 The minified JS uses short variable names (`H`, `$`, `A`, `L`) but function logic, string literals, env var names, and constants are all plaintext and readable.
@@ -51,7 +61,5 @@ Key findings:
 - Max is floored to never be lower than default, that's the only constraint
 - Values like `3600000` (1h) would work fine
 
-**FOR AI AGENTS**: You've just read a memory file containing valuable, semi-static information about the following topic: Inspecting the Claude Code binary for source code, config validation, and env var behavior. If the information contained here becomes (or already is) outdated due to your actions, the user's actions, a third party's actions, or happenings of the world. You must use your write tool to update it.
-
-Sections prone to be outdated: Binary Location (version path), Example timeout logic (could change in future releases)
-How to verify if any of the sections prone to be outdated is outdated: Run `readlink -f $(which claude)` for path; re-run the strings grep for timeout logic and compare
+---
+Update this memory when the information above becomes outdated.

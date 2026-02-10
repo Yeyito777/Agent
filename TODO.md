@@ -1,4 +1,6 @@
-- Give kit the qutebrowser skill which works on my fork of qutebrowser in a separate X render (that only it can see) and it can do actions for me, I can bring that X render forward though. (Holy engineering!)
-- Give kit the following skills:
+- Give Agent the qutebrowser skill which works on my fork of qutebrowser in a separate X render (that only it can see) and it can do actions for me, I can bring that X render forward though. (Holy engineering!)
+- Give Agent the following skills:
     - get and send email
     - browser use [Refer to the first todo item]
+- Patch LibrePods ear detection to switch PipeWire audio sink (AirPods on → AirPods sink, AirPods off → speakers). See reference/librepods-ear-switch-patch.md for the full plan.
+- Clean up disk. See memory/disk-audit-cleanup-guide.md for the full audit and candidates.

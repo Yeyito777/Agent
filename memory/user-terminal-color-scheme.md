@@ -37,7 +37,5 @@ Defined in: `/home/yeyito/Config/st/config.h` (lines 99-129)
 \e[0m   → reset
 ```
 
-**FOR AI AGENTS**: You've just read a memory file containing valuable, semi-static information about the following topic: User's terminal color scheme. If the information contained here becomes (or already is) outdated due to your actions, the user's actions, a third party's actions, or happenings of the world. You must use your write tool to update it.
-
-Sections prone to be outdated: Palette table, Defaults
-How to verify if any of the sections prone to be outdated is outdated: Run `grep -A 30 'colorname\[\]' /home/yeyito/Config/st/config.h` and compare against the table
+---
+Update this memory when the information above becomes outdated.

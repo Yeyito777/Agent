@@ -20,7 +20,5 @@ Stored at: `~/.config/git/.git-credentials`
 | `s` | `status` |
 | `sync` | `!git pull --rebase && git push` |
 
-**FOR AI AGENTS**: You've just read a memory file containing valuable, semi-static information about the following topic: User's git configuration file location. If the information contained here becomes (or already is) outdated due to your actions, the user's actions, a third party's actions, or happenings of the world. You must use your write tool to update it.
-
-Sections prone to be outdated: Current Aliases table
-How to verify if any of the sections prone to be outdated is outdated: Run `git config --global --list` and compare aliases
+---
+Update this memory when the information above becomes outdated.

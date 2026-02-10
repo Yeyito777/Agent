@@ -1,9 +1,9 @@
 # Helm
 
-A CLI harness that lets Kit drive live qutebrowser instances through the terminal.
+A CLI harness that lets Agent drive live qutebrowser instances through the terminal.
 
 ## Core idea
-The same way coreutils give Kit the filesystem (`ls`, `cat`, `grep`), Helm gives Kit the browser (`helm tabs`, `helm dom`, `helm click`). Built on top of qutebrowser's IPC socket and Python internals — possible because the user builds qutebrowser from source.
+The same way coreutils give Agent the filesystem (`ls`, `cat`, `grep`), Helm gives Agent the browser (`helm tabs`, `helm dom`, `helm click`). Built on top of qutebrowser's IPC socket and Python internals — possible because the user builds qutebrowser from source.
 
 ## Capability layers
 
@@ -11,7 +11,7 @@ The same way coreutils give Kit the filesystem (`ls`, `cat`, `grep`), Helm gives
 - `helm tabs` — list open tabs (url + title + index)
 - `helm dom [selector]` — get DOM / outerHTML of current tab or a specific element
 - `helm attrs <selector>` — element attributes, text, computed styles
-- `helm screenshot [selector]` — screenshot tab or element (Kit can read images)
+- `helm screenshot [selector]` — screenshot tab or element (Agent can read images)
 - `helm meta` — page metadata (title, url, scroll position)
 
 ### Act (mutations, reversible)
@@ -28,15 +28,15 @@ The same way coreutils give Kit the filesystem (`ls`, `cat`, `grep`), Helm gives
 - `helm back` / `helm forward` — history navigation
 
 ## Architecture
-A single Python CLI tool that talks to qutebrowser's IPC socket, sends commands, and returns structured output to stdout. Kit calls it via Bash like any other command.
+A single Python CLI tool that talks to qutebrowser's IPC socket, sends commands, and returns structured output to stdout. Agent calls it via Bash like any other command.
 
 ```
-Kit (claude code) --bash--> helm (python cli) --ipc--> qutebrowser
+Agent (claude code) --bash--> helm (python cli) --ipc--> qutebrowser
                   <-stdout--                  <-ipc---
 ```
 
 ## Permission model
-Read commands are free. Act/Navigate commands could be gated behind confirmation (same pattern Kit already uses for destructive shell commands), but since the user is giving full control this is optional.
+Read commands are free. Act/Navigate commands could be gated behind confirmation (same pattern Agent already uses for destructive shell commands), but since the user is giving full control this is optional.
 
 ## Name rationale
 "Helm" — the station from which you steer a ship. Short (4 chars), verb-able, implies both observation and control. Fits the user's ocean-themed terminal aesthetic.

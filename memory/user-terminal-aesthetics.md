@@ -8,15 +8,15 @@ User's CLI/terminal visual style preferences (bold, gradients, ASCII art, brandi
 
 # Approved Examples
 
-## KIT startup banner
+## AGENT startup banner
 6-line block letters with vertical gradient (lagoon aqua → aqua splash → seafoam teal):
 ```
-██╗  ██╗██╗████████╗
-██║ ██╔╝██║╚══██╔══╝
-█████╔╝ ██║   ██║
-██╔═██╗ ██║   ██║
-██║  ██╗██║   ██║
-╚═╝  ╚═╝╚═╝   ╚═╝
+ █████╗  ██████╗ ███████╗███╗   ██╗████████╗
+██╔══██╗██╔════╝ ██╔════╝████╗  ██║╚══██╔══╝
+███████║██║  ███╗█████╗  ██╔██╗ ██║   ██║
+██╔══██║██║   ██║██╔══╝  ██║╚██╗██║   ██║
+██║  ██║╚██████╔╝███████╗██║ ╚████║   ██║
+╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚═╝  ╚═══╝   ╚═╝
 ```
 
 # When This Applies
@@ -25,7 +25,5 @@ User's CLI/terminal visual style preferences (bold, gradients, ASCII art, brandi
 - Startup messages
 - Any "make it look nice" request for terminal output
 
-**FOR AI AGENTS**: You've just read a memory file containing valuable, semi-static information about the following topic: User's terminal aesthetic preferences. If the information contained here becomes (or already is) outdated due to your actions, the user's actions, a third party's actions, or happenings of the world. You must use your write tool to update it.
-
-Sections prone to be outdated: Principles, Approved Examples
-How to verify if any of the sections prone to be outdated is outdated: Ask the user if their preferences have changed
+---
+Update this memory when the information above becomes outdated.
