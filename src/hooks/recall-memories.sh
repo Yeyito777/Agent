@@ -74,13 +74,14 @@ fi
 log "Found $(echo "$POINTERS" | wc -l) memory pointers"
 
 # --- Ask opus which memories are relevant ---
-SYSTEM_PROMPT="You are a memory retrieval system. You receive a user prompt and a list of memory files with descriptions. Output ONLY the filenames (one per line, e.g. memory/foo-bar.md) of memories relevant to the user's prompt. No explanations, no markdown, no numbering. If none are relevant, output nothing."
-
-QUERY="User prompt:
-${PROMPT}
+QUERY="Which of these memories are relevant to the user prompt below? Output ONLY the filenames (one per line, e.g. memory/foo-bar.md). No explanations, no markdown, no numbering. If none are relevant, output nothing.
 
 Available memories:
-${POINTERS}"
+${POINTERS}
+
+<user_prompt>
+${PROMPT}
+</user_prompt>"
 
 log "Calling opus..."
 log "Query being sent: ${QUERY:0:300}..."
@@ -88,8 +89,9 @@ STDERR_LOG=$(mktemp)
 RESULT=$(echo "$QUERY" | (cd /tmp && AGENT_HOOK_ID="" RECALL_HOOK_RUNNING=1 timeout 25 claude -p \
   --model opus \
   --max-turns 1 \
+  --tools "" \
   --no-session-persistence \
-  --system-prompt "$SYSTEM_PROMPT" \
+  --system-prompt "" \
   2>"$STDERR_LOG")) || { log "SKIP: claude -p failed or timed out (exit $?)"; log "stderr: $(cat "$STDERR_LOG")"; rm -f "$STDERR_LOG"; exit 0; }
 if [[ -s "$STDERR_LOG" ]]; then
   log "claude -p stderr: $(cat "$STDERR_LOG")"

@@ -14,7 +14,7 @@ printf '\e[38;2;46;196;182m██║  ██║╚██████╔╝██
 printf '\e[38;2;46;196;182m╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚═╝  ╚═══╝   ╚═╝\e[0m\n'
 
 cd "$AGENT_DIR"
-python3 src/refresh_pointers.py
+# python3 src/refresh_pointers.py
 export AGENT_HOOK_ID=$(openssl rand -hex 4)
 mkdir -p runtime
 touch "runtime/recalled-${AGENT_HOOK_ID}" "runtime/hook-${AGENT_HOOK_ID}.log"
