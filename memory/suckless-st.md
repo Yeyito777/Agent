@@ -1,4 +1,4 @@
-User's st (simple terminal) fork — location, build workflow, code organization, testing, and features.
+st simple terminal fork — source at ~/Config/st/, code organization (st.c, x.c, vimnav.c, sshind.c, notif.c), vim navigation mode, SSH indicator overlay, notification popups, CWD tracking via OSC 779, debug mode, make test, config.h, zsh vi-mode coordination, suckless build workflow
 
 # Location
 - Source: `/home/yeyito/Config/st/`

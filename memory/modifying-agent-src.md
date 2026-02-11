@@ -1,4 +1,4 @@
-Guidelines and external dependencies when modifying Agent's src/ directory
+Agent src/ modification guide — external references (start.sh zshrc alias, hook scripts in settings.local.json, reconcile_metadata.py, refresh_pointers.py), startup flow (agent alias → start.sh → reconcile → claude), checklist for renaming/moving/deleting src/ files
 
 # External References
 Files **outside** Agent that reference files inside `src/`. Update these when renaming/moving/deleting src/ files.

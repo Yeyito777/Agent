@@ -1,4 +1,4 @@
-Supcord — decentralized Discord alternative project at ~/Workspace/Supcord
+Supcord decentralized Discord alternative — Rust Axum backend, React TypeScript Vite frontend, Tauri v2 desktop app, Ed25519 identity, SQLite storage, WebSocket JSON protocol, privacy-first chat at ~/Workspace/Supcord, Phase 1 complete, E2EE planned
 
 # Motivation
 Built because Discord added age verification and face ID tracking. Privacy-first alternative with no verification, no accounts, no data harvesting.

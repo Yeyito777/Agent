@@ -1,4 +1,4 @@
-User's dmenu fork — location, build workflow, patches, and key details.
+dmenu fork — source at ~/Config/dmenu/, patches applied (vi-mode, center, border), config.h configuration, suckless build workflow (make && sudo make install), code organization (dmenu.c, drw.c, stest.c), no test suite
 
 # Location
 - Source: `/home/yeyito/Config/dmenu/`

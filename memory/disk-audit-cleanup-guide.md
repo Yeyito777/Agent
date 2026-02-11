@@ -1,4 +1,4 @@
-Disk audit and cleanup guide for the user's Arch Linux system (single 916G NVMe, ext4, ~68G used as of Feb 2026)
+Arch Linux disk audit and cleanup — NVMe partition usage breakdown, cleanup candidates (pip/qutebrowser/go/yay caches, build artifacts, pacman cache, coredumps, orphaned packages), du/paccache/journalctl commands, per-directory size analysis, safe vs risky cleanup actions, disk space, storage
 
 ## System layout
 

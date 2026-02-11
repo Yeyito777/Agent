@@ -1,4 +1,4 @@
-User's qutebrowser fork with custom QtWebEngine — source location, build workflow, submodule structure, and reference docs. For runtime config/containers see memory/qutebrowser-runtime.md.
+Qutebrowser fork with custom QtWebEngine/Chromium build — source at ~/Workspace/Qutebrowser/, submodule chain (qtwebengine, chromium, pyqt6-webengine SIP bindings), install.sh build workflow, ladder-commit, reference docs (element shader, web settings, hinting, native elements), pytest testing. For runtime config see qutebrowser-runtime.md
 
 # Location
 - Source: `/home/yeyito/Workspace/Qutebrowser/`

@@ -1,4 +1,4 @@
-User's todo file organization (personal todo, project TODOs, "my todo" terminology)
+Todo file locations and terminology — personal todo at ~/Desktop/todo.md ("my todo"), project-specific TODO.md files, Agent TODO.md, disambiguating "my todo" vs "project todo" vs "Agent todo"
 
 # Structure
 - **Personal todo**: `~/Desktop/todo.md` — the user's own task list

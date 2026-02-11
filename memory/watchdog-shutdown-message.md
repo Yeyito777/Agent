@@ -1,4 +1,4 @@
-Watchdog "did not stop!" shutdown message — cause, fix, and future server considerations.
+systemd watchdog "did not stop!" shutdown message — sp5100_tco AMD TCO timer module, RebootWatchdogSec=off fix in /etc/systemd/system.conf, systemd 259 behavior change, hardware watchdog for future server repurposing, poweroff/reboot warning
 
 # Watchdog Shutdown Message
 

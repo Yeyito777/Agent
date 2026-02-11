@@ -1,4 +1,4 @@
-How dmenu works, where scripts go, and how it integrates with dwm
+dmenu scripting and usage guide — stdin|dmenu|action pattern, writing new dmenu scripts in ~/.local/bin/, dwm keybindings, flags (-c center, -l lines, -p prompt, -t truncate), appearance config, clipmenu integration, adding dmenu commands to dwm config.h
 
 # What dmenu is
 dmenu is a generic menu/picker. It reads a list of lines on stdin, lets the user fuzzy-search, and outputs the selected line on stdout. It is not an app launcher or clipboard manager by itself — it's a building block other scripts use as their UI.

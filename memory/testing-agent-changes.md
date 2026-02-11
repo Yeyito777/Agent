@@ -1,4 +1,4 @@
-How to safely test changes to the Agent system without affecting the live installation
+Testing Agent system changes safely — clone to /tmp/Agent-test, running hooks manually with env vars (CLAUDE_PROJECT_DIR, AGENT_HOOK_ID, AGENT_TERMINAL_PID), bash -x tracing, mock memories and metadata, controlling runtime state (session-counter, last-forgetting-session), st-notify notification testing
 
 # Methodology
 Clone the Agent directory to `/tmp/Agent-test` and run all tests against the clone. This isolates the live system from broken hooks, corrupted metadata, or accidental memory deletion.

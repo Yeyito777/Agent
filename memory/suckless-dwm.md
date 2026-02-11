@@ -1,4 +1,4 @@
-User's dwm (dynamic window manager) fork — location, build workflow, and key details.
+dwm dynamic window manager fork — source at ~/Config/dwm/, tiling WM, config.h keybindings/layouts/rules, suckless build workflow, NEVER send signals to dwm (kills X session), dwmblocks status bar, reference docs (spawn-term-here, persist-mode), restart warning
 
 # Location
 - Source: `/home/yeyito/Config/dwm/`

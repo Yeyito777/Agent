@@ -1,4 +1,4 @@
-Qutebrowser runtime configuration, user scripts, and containerization setup.
+Qutebrowser runtime config and --basedir containerization — container at ~/.runtime/qutebrowser-yeyito/, directory structure (config/data/cache/download/runtime), config.py with whale theme, greasemonkey userscripts, CSS overrides, relative path requirement, Qt ghost directories, IPC socket isolation
 
 # Containerization
 

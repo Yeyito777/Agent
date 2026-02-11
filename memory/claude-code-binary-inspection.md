@@ -1,4 +1,4 @@
-Inspecting Claude Code's bundled binary for source code and config validation (strings, ELF, minified JS)
+Claude Code binary inspection — ELF binary location (~/.local/share/claude/versions/), extracting minified JS via strings, safe search method (dump to /tmp first, never pipe directly), BASH_DEFAULT_TIMEOUT_MS/BASH_MAX_TIMEOUT_MS env vars, avoiding event loop crash from stdout flooding
 
 # Binary Location
 - Symlink: `~/.local/bin/claude`

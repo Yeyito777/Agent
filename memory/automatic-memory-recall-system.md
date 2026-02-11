@@ -1,4 +1,4 @@
-Automatic memory system — how memories are surfaced, updated, and forgotten via hooks
+Agent memory system architecture — recall/update/forgetting hook agents, UserPromptSubmit opus subclaude for recall, session counter, memory-metadata JSON (frequency, appreciation, pinned), agent.conf toggles, cold storage archival to memory-cold/, hook recursion prevention, runtime files, debugging hooks
 
 # Overview
 Three hook-driven subagents, all toggleable via `agent.conf`:

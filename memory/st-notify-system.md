@@ -1,4 +1,4 @@
-How to send popup notifications to the user's st terminal using st-notify
+st-notify popup notification system — usage and options (--timeout, --border, --background, --foreground, --textsize), _ST_NOTIFY X11 property wire protocol, xprop/xdotool, toast stacking, default appearance, sending notifications from shell scripts to st terminal
 
 # Location
 - Source: `/home/yeyito/Config/st/notif.c`, `/home/yeyito/Config/st/notif.h`

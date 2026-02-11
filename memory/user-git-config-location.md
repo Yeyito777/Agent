@@ -1,4 +1,4 @@
-User's git config location (gitconfig, GIT_CONFIG_GLOBAL, credentials)
+Git configuration — non-default gitconfig path at ~/.config/git/.gitconfig, GIT_CONFIG_GLOBAL env var, git-credentials location, aliases (s=status, sync=pull+push)
 
 # Location
 Git config is NOT at the default `~/.gitconfig`. It's at:

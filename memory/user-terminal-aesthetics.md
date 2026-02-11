@@ -1,4 +1,4 @@
-User's CLI/terminal visual style preferences (bold, gradients, ASCII art, branding)
+Terminal visual style preferences — ASCII art banners, block letter branding, vertical color gradients, bold splash screens, CLI tool aesthetics, startup messages, "make it look nice" terminal output guidelines
 
 # Principles
 - **Bold over minimal**: Prefer big, impactful ASCII art over small one-liners

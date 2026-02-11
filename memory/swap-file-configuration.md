@@ -1,4 +1,4 @@
-Swap file setup on the user's system — how it's configured, and how to undo/redo it.
+Linux swap file setup — 16GB /swapfile, fstab configuration, swappiness default 60, create/remove/resize swap commands, OOM prevention for heavy builds, clone-to-disk.sh integration for disk cloning
 
 # Swap File Configuration
 

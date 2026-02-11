@@ -1,4 +1,4 @@
-User's keyboard configuration — keyd remappings, repeat rate, and right shift behavior in st
+Keyboard configuration — keyd remappings (caps lock to escape, escape to F13), key repeat rate (startx -ardelay 200 -arinterval 22), right shift zsh autosuggestion in st, XKB F13 fix with pacman hook, lock-keyboard-daemon, /etc/keyd/default.conf, keysym, xmodmap alternative
 
 # Remappings (kernel-level via keyd)
 - **Caps Lock → Escape**

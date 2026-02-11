@@ -1,7 +1,7 @@
 {
-  "frequency": 3,
-  "last_accessed_session": 15,
+  "frequency": 5,
+  "last_accessed_session": 0,
   "created_session": 0,
   "appreciation": 0,
-  "pinned": false
+  "pinned": true
 }
