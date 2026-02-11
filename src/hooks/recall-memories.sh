@@ -12,6 +12,22 @@ if [[ -n "${RECALL_HOOK_RUNNING:-}" ]]; then
   exit 0
 fi
 
+# --- Session counter: increment on first message of each session ---
+if [[ -n "${AGENT_HOOK_ID:-}" && -n "${CLAUDE_PROJECT_DIR:-}" ]]; then
+  _LAST_INC="${CLAUDE_PROJECT_DIR}/runtime/session-last-increment"
+  _LAST_ID=$(cat "$_LAST_INC" 2>/dev/null || echo "")
+  if [[ "$_LAST_ID" != "$AGENT_HOOK_ID" ]]; then
+    SESSION_FILE="${CLAUDE_PROJECT_DIR}/runtime/session-counter"
+    if [[ -f "$SESSION_FILE" ]]; then
+      export AGENT_SESSION=$(( $(cat "$SESSION_FILE") + 1 ))
+    else
+      export AGENT_SESSION=0
+    fi
+    echo "$AGENT_SESSION" > "$SESSION_FILE"
+    echo "$AGENT_HOOK_ID" > "$_LAST_INC"
+  fi
+fi
+
 # --- Check agent.conf toggle ---
 CONF="${CLAUDE_PROJECT_DIR:-}/agent.conf"
 if [[ -f "$CONF" ]] && grep -qx 'MEMORY_RECALL=off' "$CONF"; then
@@ -123,6 +139,20 @@ while IFS= read -r line; do
   echo "$line" >> "$RECALLED_FILE"
   NEW_MEMORIES+=("$line")
   log "RECALLED: $line"
+
+  # Update metadata (frequency + last_accessed_session)
+  MEM_NAME=$(basename "$line" .md)
+  META_FILE="${AGENT_DIR}/memory-metadata/${MEM_NAME}.json"
+  if [[ -f "$META_FILE" ]]; then
+    python3 -c "
+import json
+f = '${META_FILE}'
+with open(f) as fh: d = json.load(fh)
+d['frequency'] = d.get('frequency', 0) + 1
+d['last_accessed_session'] = ${AGENT_SESSION:-0}
+with open(f, 'w') as fh: json.dump(d, fh, indent=2); fh.write('\n')
+" 2>/dev/null || log "WARN: failed to update metadata for $line"
+  fi
 done <<< "$RESULT"
 
 # --- Output context ---

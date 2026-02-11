@@ -48,4 +48,4 @@ Ideas on how to harden removing .save files:
     * The shell that poweroff would run in would have to be detached since dwm quitting kills the parent st window (and thus the shell) where poweroff was called.
 - When dwm receives a SIGTERM, it first triggers the scan→prune→end sequence before exiting.
 
-/consider
+Consider what I just told you and tell me your thoughts. I need to know what you think: am I correct, incorrect? Is there something I'm missing? Anything not ironed out? Or is everything largely ok? Talk to me.

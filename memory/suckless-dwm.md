@@ -18,6 +18,7 @@ User's dwm (dynamic window manager) fork — location, build workflow, and key d
 # Reference Docs
 Located in `reference/` directory — read these before touching related features:
 - `spawn-term-here.md` — spawning terminals in the current working directory
+- `persist-mode.md` — `--persist` flag, session save/restore, `_DWM_SAVE_ARGV` IPC
 
 # Building
 ```bash

@@ -38,6 +38,18 @@ find_terminal_pid() {
   done
 }
 export AGENT_TERMINAL_PID=$(find_terminal_pid)
-mkdir -p runtime
+mkdir -p runtime memory-metadata memory-cold
+
+# Reconcile memory metadata (uses current counter value, does not increment)
+python3 src/reconcile_metadata.py
+
+# Notify upcoming session number (counter increments on first message, not here)
+SESSION_FILE="${AGENT_DIR}/runtime/session-counter"
+NEXT_SESSION=$(( $(cat "$SESSION_FILE" 2>/dev/null || echo "-1") + 1 ))
+if [[ -n "$AGENT_TERMINAL_PID" ]] && command -v st-notify &>/dev/null; then
+  st-notify -t 10000 -b "#ff6b9d" -bg "#1a0010" -fg "#f1faee" \
+    "$AGENT_TERMINAL_PID" "Session $NEXT_SESSION" &>/dev/null &
+fi
+
 touch "runtime/recalled-${AGENT_HOOK_ID}" "runtime/hook-${AGENT_HOOK_ID}.log"
 claude --dangerously-skip-permissions

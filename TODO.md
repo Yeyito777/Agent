@@ -8,6 +8,7 @@
 
 - [ ] Add to CLAUDE.md inside each project that I care about a "How to test this" section. This section should get fed to the agent through a tool hook, so that for example it always knows to test its changes with st -d by spawning a window and having it print the necessary output (sidestepping it being able to use UI entirely).
 
-- [ ] Memory audit / cleaner agent in a cron job that checks that everything is up to date and also makes sure that titles, and descriptions can be easily picked up by context and by the recall subagent
+- [ ] ~~Memory audit / cleaner agent in a cron job that checks that everything is up to date and also makes sure that titles, and descriptions can be easily picked up by context and by the recall subagent~~ Test it.
 
-- [ ] Merge the memory update subagent with a new agent: memory creator agent, (do this after you have st notifications) and find a way to run it in this directory or /memory directory without CLAUDE.md being injected.
+# ACTUALLY MAKE A GOOD MEMORY UPDATER & CREATOR
+- [ ] Merge the memory update subagent with a new agent: memory creator agent, (do this after you have st notifications) and find a way to run it in this directory or /memory directory without CLAUDE.md being injected. And make it so that it can onlyu choose to update memories that have been recalled.

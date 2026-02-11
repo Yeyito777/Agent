@@ -9,7 +9,9 @@ Files **outside** Agent that reference files inside `src/`. Update these when re
 | `refresh_pointers.py` | `src/start.sh` | `src/start.sh` line ~20 |
 | `hooks/recall-memories.sh` | UserPromptSubmit hook | `.claude/settings.local.json` |
 | `hooks/update-memories.sh` | Stop hook (async) | `.claude/settings.local.json` |
+| `hooks/forgetting-memories.sh` | SessionStart hook (async) | `.claude/settings.local.json` |
 | `hooks/cleanup-runtime.sh` | SessionEnd hook | `.claude/settings.local.json` |
+| `reconcile_metadata.py` | `src/start.sh` | `src/start.sh` line ~50 |
 
 # Startup Flow
 When user runs `agent` in terminal:
