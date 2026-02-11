@@ -14,11 +14,13 @@ dwm dynamic window manager fork — source at ~/Config/dwm/, tiling WM, config.h
 | `config.h` | All user configuration (keybindings, layouts, colors, rules) |
 | `config.def.h` | Default config template |
 | `reference/` | Reference docs — read these before touching related features |
+| `scripts/` | Helper scripts (e.g. `dwm-save`), installed to `/usr/local/bin/` |
 
 # Reference Docs
 Located in `reference/` directory — read these before touching related features:
 - `spawn-term-here.md` — spawning terminals in the current working directory
 - `persist-mode.md` — `--persist` flag, session save/restore, `_DWM_SAVE_ARGV` IPC
+- `dwm-save.md` — `dwm-save` helper script for registering/clearing window save entries
 
 # Building
 ```bash

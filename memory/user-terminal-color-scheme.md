@@ -1,7 +1,7 @@
 st terminal color scheme — ocean-themed palette, hex values (#00050f through #f1faee), ANSI escape codes (\e[32m etc.), foreground/background/cursor defaults, color names for scripting and theming, defined in st config.h
 
 # Location
-Defined in: `/home/yeyito/Config/st/config.h` (lines 99-129)
+Defined in: `/home/yeyito/Config/st/config.h` (lines 99-131)
 
 # Palette
 | Index | Name | Hex | Semantic |

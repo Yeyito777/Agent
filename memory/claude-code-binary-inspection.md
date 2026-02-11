@@ -6,11 +6,11 @@ Claude Code binary inspection — ELF binary location (~/.local/share/claude/ver
 - Resolve with: `readlink -f $(which claude)`
 
 # What It Is
-An ELF executable — a Node.js app bundled into a single binary (likely via `pkg` or `bun compile`). The JavaScript source is **minified but not encrypted**, so it's fully readable via `strings`.
+An ELF executable — a Node.js app bundled into a single binary via `bun compile` (confirmed by `__bun` symbols in the binary). The JavaScript source is **minified but not encrypted**, so it's fully readable via `strings`.
 
 # How to Inspect
 
-**WARNING: Never pipe `strings` on the binary directly in a Bash tool call.** The binary is 80-150+ MB of mostly printable content (minified JS). Piping `strings` through `grep` produces a massive stdout stream that starves Claude Code's single-threaded Node.js event loop — the Ink/React TUI freezes, CPU pegs one core (~11%), and the app crashes. Always dump to a temp file first and search that:
+**WARNING: Never pipe `strings` on the binary directly in a Bash tool call.** The binary is ~200+ MB of mostly printable content (minified JS). Piping `strings` through `grep` produces a massive stdout stream that starves Claude Code's single-threaded Node.js event loop — the Ink/React TUI freezes, CPU pegs one core (~11%), and the app crashes. Always dump to a temp file first and search that:
 
 ```bash
 # SAFE: dump to file first, then search

@@ -1,4 +1,11 @@
-Go through every file in memory/*.md and update the first line of each to maximize retrieval by the recall agent.
+Go through every file in here:
+```md
+memory/...
+memory/...
+...
+```
+
+And update the first line of each to maximize retrieval by the recall agent.
 
 Context: The recall system generates pointers by reading ONLY the first line of each memory file. These pointers are shown to an opus subclaude that decides which memories are relevant to the user's prompt. The first line is the ONLY signal it has — it never sees the rest of the file.
 

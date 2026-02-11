@@ -71,7 +71,7 @@ Flow:
 3. Generates current memory pointers
 4. Spawns `claude -p --model opus --max-turns 15 --allowedTools "Read,Edit,Write,Glob,Bash(python3 *)"` with a strict system prompt
 5. System prompt emphasizes: if nothing needs updating, exit immediately without touching files
-6. If the subclaude does edit/create memories, it runs `python3 src/refresh_pointers.py` to keep CLAUDE.md pointers in sync
+6. If the subclaude does edit/create memories, it is instructed to run `python3 src/refresh_pointers.py` — however, this file no longer exists on disk (also commented out in `start.sh`)
 7. All output logged to `runtime/hook-<id>.log` with `[update]` prefix
 
 ## Forgetting hook (`src/hooks/forgetting-memories.sh`)
@@ -83,7 +83,7 @@ Flow:
 3. Compares against `runtime/last-forgetting-session` — skips if fewer than 60 sessions have passed
 4. On first-ever run, initializes `last-forgetting-session` and exits (no cleanup on first use)
 5. Sends pink st-notify toast: "Memory forgetting started" (45s, `#ff6b9d` border, `#1a0010` bg)
-6. Spawns `claude -p --model opus --max-turns 15` with tools: `Read,Write,Glob,Bash(mv/mkdir/ls/cd/st-notify/python3)`
+6. Spawns `claude -p --model opus --max-turns 30` with tools: `Read,Write,Glob,Bash(mv/mkdir/ls/cd/st-notify/python3)`
 7. The forgetting agent:
    - Runs a Python scoring snippet: `score = log2(1 + freq) * e^(-0.003466 * sessions_since_last_access) + appreciation` (200-session half-life)
    - Reviews bottom 3 non-pinned memories by reading their content

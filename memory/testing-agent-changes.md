@@ -10,7 +10,7 @@ rm -rf /tmp/Agent-test && cp -r /home/yeyito/Workspace/Agent /tmp/Agent-test
 ```
 
 ## Path resolution
-- `src/reconcile_metadata.py` uses `Path(__file__).parent.parent` — auto-resolves to the clone, no edits needed.
+- `src/reconcile_metadata.py` uses `Path(__file__).resolve().parent.parent` — auto-resolves to the clone, no edits needed.
 - Hook scripts use `$CLAUDE_PROJECT_DIR` — pass it as an env var when invoking manually.
 - `start.sh` has a hardcoded `AGENT_DIR` — not used during manual hook testing (hooks use `CLAUDE_PROJECT_DIR`).
 

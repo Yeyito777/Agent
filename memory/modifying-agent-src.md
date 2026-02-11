@@ -6,7 +6,6 @@ Files **outside** Agent that reference files inside `src/`. Update these when re
 | src/ file | External reference | Location |
 |-----------|-------------------|----------|
 | `start.sh` | `alias agent=...` | `~/.zshrc` |
-| `refresh_pointers.py` | `src/start.sh` | `src/start.sh` line ~20 |
 | `hooks/recall-memories.sh` | UserPromptSubmit hook | `.claude/settings.local.json` |
 | `hooks/update-memories.sh` | Stop hook (async) | `.claude/settings.local.json` |
 | `hooks/forgetting-memories.sh` | SessionStart hook (async) | `.claude/settings.local.json` |
@@ -16,7 +15,7 @@ Files **outside** Agent that reference files inside `src/`. Update these when re
 # Startup Flow
 When user runs `agent` in terminal:
 ```
-~/.zshrc alias → src/start.sh → cd to Agent → run src/refresh_pointers.py → export AGENT_HOOK_ID → create runtime/recalled-<id> → launch claude
+~/.zshrc alias → src/start.sh → cd to Agent → export AGENT_HOOK_ID → run src/reconcile_metadata.py → create runtime/recalled-<id> → launch claude
 ```
 
 # Checklist When Modifying src/

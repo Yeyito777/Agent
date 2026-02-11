@@ -28,7 +28,7 @@ Keyboard configuration — keyd remappings (caps lock to escape, escape to F13),
 - Note: keycode 179 also mapped to `XF86Tools` (duplicate) — no longer matters since nothing binds `XF86Tools`
 
 # lock-keyboard-daemon
-- Source: `~/Workspace/LockKeyboard/` (git tracked, `make install` → `~/.local/bin/`)
+- Source: `~/Workspace/.cold/LockKeyboard/` (git tracked, `make install` → `~/.local/bin/`)
 - Grabs X keyboard, lights caps lock LED, waits for Shift+F13 to unlock
 - Uses direct evdev `EV_LED` writes to `/dev/input/eventX` for instant LED control
   (keyd manages sysfs LED state and would reset writes to `/sys/class/leds/`)
