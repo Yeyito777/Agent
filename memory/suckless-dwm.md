@@ -13,7 +13,11 @@ User's dwm (dynamic window manager) fork — location, build workflow, and key d
 | `transient.c` | Transient window handling |
 | `config.h` | All user configuration (keybindings, layouts, colors, rules) |
 | `config.def.h` | Default config template |
-| `reference/` | Reference docs (e.g. `spawn-term-here.md`) |
+| `reference/` | Reference docs — read these before touching related features |
+
+# Reference Docs
+Located in `reference/` directory — read these before touching related features:
+- `spawn-term-here.md` — spawning terminals in the current working directory
 
 # Building
 ```bash
