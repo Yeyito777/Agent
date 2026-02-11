@@ -74,14 +74,14 @@ fi
 log "Found $(echo "$POINTERS" | wc -l) memory pointers"
 
 # --- Ask opus which memories are relevant ---
-QUERY="Which of these memories are relevant to the user prompt below? Output ONLY the filenames (one per line, e.g. memory/foo-bar.md). No explanations, no markdown, no numbering. If none are relevant, output nothing.
-
-Available memories:
-${POINTERS}
+QUERY="Given the following user prompt, which memories are relevant? Output ONLY the filenames (one per line, e.g. memory/foo-bar.md). No explanations, no markdown, no numbering. If none are relevant, output nothing.
 
 <user_prompt>
 ${PROMPT}
-</user_prompt>"
+</user_prompt>
+
+Available memories:
+${POINTERS}"
 
 log "Calling opus..."
 log "Query being sent: ${QUERY:0:300}..."
@@ -133,7 +133,7 @@ if [[ ${#NEW_MEMORIES[@]} -gt 0 ]]; then
   # Notify terminal via st-notify (one toast per memory)
   if [[ -n "${AGENT_TERMINAL_PID:-}" ]] && command -v st-notify &>/dev/null; then
     for mem in "${NEW_MEMORIES[@]}"; do
-      st-notify -t 7000 -ts 16 -b "#ffaf87" -bg "#0a0806" -fg "#ffaf87" \
+      st-notify -t 15000 -ts 18 -b "#4ddbb7" -bg "#001a0f" -fg "#f1faee" \
         "$AGENT_TERMINAL_PID" "recalled ${mem}" &>/dev/null &
     done
     log "Sent ${#NEW_MEMORIES[@]} st-notify toasts to PID ${AGENT_TERMINAL_PID}"
