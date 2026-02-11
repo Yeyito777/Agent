@@ -1,6 +1,17 @@
-Testing Agent system changes safely — clone to /tmp/Agent-test, running hooks manually with env vars (CLAUDE_PROJECT_DIR, AGENT_HOOK_ID, AGENT_TERMINAL_PID), bash -x tracing, mock memories and metadata, controlling runtime state (session-counter, last-forgetting-session), st-notify notification testing
+Testing Agent system changes safely — regression tests (tests/run.sh), clone to /tmp/Agent-test, running hooks manually with env vars (CLAUDE_PROJECT_DIR, AGENT_HOOK_ID, AGENT_TERMINAL_PID), bash -x tracing, mock memories and metadata, controlling runtime state (session-counter, last-forgetting-session, last-validation-session), st-notify notification testing
 
-# Methodology
+# Regression tests
+**Always run regression tests first** before manual testing when modifying hooks or Agent infrastructure:
+```bash
+./tests/run.sh
+```
+- 60 automated assertions covering validation, forgetting, and cross-hook scheduling
+- Uses a mock `claude` binary (no API calls, no cost) — tests all gating logic, lock mechanisms, toggles, recursion guards, memory selection, and prompt construction
+- Clones to `/tmp/Agent-test` internally, cleans up on exit
+- Filter by substring: `./tests/run.sh validation`, `./tests/run.sh forgetting`, `./tests/run.sh cross-hook`
+- If adding a new hook or changing scheduling logic, add corresponding test functions to `tests/run.sh`
+
+# Manual testing methodology
 Clone the Agent directory to `/tmp/Agent-test` and run all tests against the clone. This isolates the live system from broken hooks, corrupted metadata, or accidental memory deletion.
 
 # Setup
@@ -73,9 +84,12 @@ Then overwrite the generated metadata with known test values.
 Set specific values to trigger or skip behaviors:
 ```bash
 echo "100" > /tmp/Agent-test/runtime/session-counter
-echo "30"  > /tmp/Agent-test/runtime/last-forgetting-session  # triggers cleanup (100-30=70 >= 60)
-echo "90"  > /tmp/Agent-test/runtime/last-forgetting-session  # skips cleanup (100-90=10 < 60)
+echo "0"   > /tmp/Agent-test/runtime/last-forgetting-session  # triggers at session 200 (200%200==0, lock≠200)
+echo "200" > /tmp/Agent-test/runtime/last-forgetting-session  # skips at session 200 (lock==200, already ran)
 rm -f /tmp/Agent-test/runtime/last-forgetting-session          # first-ever run (initializes)
+echo "75"  > /tmp/Agent-test/runtime/last-validation-session   # triggers at session 175 (175%100==75, lock≠175)
+echo "175" > /tmp/Agent-test/runtime/last-validation-session   # skips at session 175 (lock==175, already ran)
+rm -f /tmp/Agent-test/runtime/last-validation-session           # first-ever run (initializes)
 ```
 
 ## Testing hooks that spawn claude -p

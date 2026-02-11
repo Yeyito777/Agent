@@ -31,6 +31,15 @@ No need for `make clean` — just `make && sudo make install`.
 # Makefile Targets
 `all` (dwm), `clean`, `dist`, `install`, `uninstall`
 
+# Persist Mode (`--persist` / `-p`)
+`dwm -p` saves/restores windows across restarts via `~/.runtime/dwm/`.
+- Programs opt in by setting `_DWM_SAVE_ARGV` X11 property (via `dwm-save` script or `xprop`)
+- dwm writes `.save` files (argv + metadata) in numbered tag dirs (`1/`, `2/`, ...)
+- On window death (`unmanage()`), the `.save` file is removed
+- On restore startup: backs up to `dwm-backup/`, reads `.save` files, spawns programs, deletes files (programs re-register themselves)
+- SIGTERM handler for clean shutdown; liveness pruning on quit
+- See `reference/persist-mode.md` and `reference/dwm-save.md` for full details
+
 # Applying Changes
 **CRITICAL**: The user restarts dwm themselves. NEVER send signals to dwm (kill -HUP, pkill, etc.) — this kills the entire X session and all running programs. After building, just tell the user the build is ready and they'll restart dwm on their own.
 
