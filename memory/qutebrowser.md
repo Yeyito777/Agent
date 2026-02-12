@@ -1,4 +1,4 @@
-Qutebrowser fork with custom QtWebEngine/Chromium build — source at ~/Workspace/Qutebrowser/, submodule chain (qtwebengine, chromium, pyqt6-webengine SIP bindings), install.sh build workflow, ladder-commit, reference docs (element shader, web settings, hinting, native elements, dwm-persist), dwm persist integration (_DWM_SAVE_ARGV), pytest testing. For runtime config see qutebrowser-runtime.md
+Qutebrowser fork with custom QtWebEngine/Chromium build — source at ~/Workspace/Qutebrowser/, submodule chain (qtwebengine, chromium, pyqt6-webengine SIP bindings), install.sh build workflow, ladder-commit, reference docs (element shader, web settings, hinting, native elements, dwm-persist, tab-runtime), dwm persist integration (_DWM_SAVE_ARGV), tab runtime manager (filesystem IPC for live tab state), pytest testing. For runtime config see qutebrowser-runtime.md
 
 # Location
 - Source: `/home/yeyito/Workspace/Qutebrowser/`
@@ -42,6 +42,7 @@ Located in `reference/` directory — read these before touching related feature
 - `javascript-hinting.md` — JavaScript hint target system
 - `native-elements.md` — NativeTheme, Chromium native form controls (checkboxes, radios, etc.), Skia rendering
 - `dwm-persist.md` — dwm persist mode integration, `_DWM_SAVE_ARGV` X11 property registration from `showEvent()`
+- `tab-runtime.md` — tab runtime manager, filesystem IPC for live tab state, signal wiring, directory layout
 
 # Building
 | Command | Purpose |
@@ -63,6 +64,9 @@ Located in `reference/` directory — read these before touching related feature
 source .venv/bin/activate
 QT_QPA_PLATFORM=offscreen PYTHONPATH=. pytest tests/unit/path/to/test.py -v
 ```
+
+# Tab Runtime Manager
+`TabRuntimeManager` in `qutebrowser/browser/tabruntime.py` exposes live tab state as plain-text files in `{basedir}/runtime/tabs/`. Each tab gets a `{tab_id}/tab-data.info` file with key-value pairs (url, title, index, pinned, load_status, private, audio, window, created_at). An `order` file lists tab_ids in tab-bar order. Instantiated once per `TabbedBrowser` (one line in `tabbedbrowser.py:247`). See `reference/tab-runtime.md` for full signal wiring, field reference, and design decisions.
 
 # Critical Workflow Notes
 - **Do NOT run git commands** (commit, push, checkout, etc.) unless explicitly instructed. User manages git manually.

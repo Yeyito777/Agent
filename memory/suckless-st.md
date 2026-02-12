@@ -13,7 +13,7 @@ st simple terminal fork — source at ~/Config/st/, code organization (st.c, x.c
 | `vimnav.c` / `vimnav.h` | Vim-style navigation mode (escape → hjkl, Ctrl+u/d, visual select) |
 | `sshind.c` / `sshind.h` | SSH indicator overlay |
 | `notif.c` / `notif.h` | Notification popup overlay |
-| `persist.c` / `persist.h` | dwm persist integration (save/restore scrollback, CWD) |
+| `persist.c` / `persist.h` | dwm persist integration (save/restore scrollback, screen, cursor_y, CWD) |
 | `config.h` | All user configuration (fonts, colors, keybindings) |
 | `config.def.h` | Default config template |
 
@@ -22,7 +22,7 @@ st simple terminal fork — source at ~/Config/st/, code organization (st.c, x.c
 - **SSH indicator**: overlay showing active SSH hostname
 - **Notification popups**: via `_ST_NOTIFY` X11 property; helper script at `scripts/st-notify`
 - **CWD tracking**: shell reports cwd via OSC 779, stored as `_ST_CWD` X11 property and in-memory via `persist_set_cwd()`
-- **Persistence**: survives dwm restarts — saves scrollback history, screen content, and CWD to `~/.runtime/st/st-<pid>/` every 30s and on exit. Registers with dwm via `_DWM_SAVE_ARGV`, restores via `st --from-save <dir>`. See `reference/persist.md` for full technical details.
+- **Persistence**: survives dwm restarts — saves scrollback history, screen content, cursor row, and CWD to `~/.runtime/st/st-<pid>/` every 30s and on exit. Registers with dwm via `_DWM_SAVE_ARGV`, restores via `st --from-save <dir>`. On restore, `persist_restore()` returns saved dimensions so `xinit()` creates the window at the correct size (avoids tresize content loss). See `reference/persist.md` for full technical details.
 - **Debug mode**: `-d` flag for prompt overlay/highlight
 - **zsh coordination**: terminal works closely with zsh vi-mode; see `README.md` for required `.zshrc` config
 
