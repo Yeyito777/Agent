@@ -34,13 +34,15 @@ if [[ ! -f "$SESSION_FILE" ]]; then
 fi
 CURRENT_SESSION=$(cat "$SESSION_FILE")
 
-# --- Read interval from agent.conf (default: 200) ---
-FORGETTING_INTERVAL=$(grep '^MEMORY_FORGETTING_INTERVAL=' "$CONF" 2>/dev/null | cut -d= -f2 || true)
-FORGETTING_INTERVAL="${FORGETTING_INTERVAL:-200}"
+# --- Read schedule from agent.conf (default: 0/200) ---
+FORGETTING_SCHEDULE=$(grep '^MEMORY_FORGETTING_SCHEDULE=' "$CONF" 2>/dev/null | cut -d= -f2 || true)
+FORGETTING_SCHEDULE="${FORGETTING_SCHEDULE:-0/200}"
+FORGETTING_OFFSET="${FORGETTING_SCHEDULE%%/*}"
+FORGETTING_CYCLE="${FORGETTING_SCHEDULE##*/}"
 
-# --- Check if cleanup is due (fires at 0 mod interval) ---
-if (( CURRENT_SESSION % FORGETTING_INTERVAL != 0 )); then
-  log "SKIP: session $CURRENT_SESSION is not 0 mod $FORGETTING_INTERVAL"
+# --- Check if cleanup is due ---
+if (( CURRENT_SESSION % FORGETTING_CYCLE != FORGETTING_OFFSET )); then
+  log "SKIP: session $CURRENT_SESSION is not $FORGETTING_OFFSET mod $FORGETTING_CYCLE"
   exit 0
 fi
 
@@ -63,10 +65,9 @@ log "--- Forgetting agent triggered (session $CURRENT_SESSION) ---"
 echo "$CURRENT_SESSION" > "$LAST_FILE"
 
 # --- Start notification ---
-NOTIFY_PID="${AGENT_TERMINAL_PID:-}"
-if [[ -n "$NOTIFY_PID" ]] && command -v st-notify &>/dev/null; then
+if [[ -n "${AGENT_TERMINAL_PID:-}" ]] && command -v st-notify &>/dev/null; then
   st-notify -t 45000 -b "#ff6b9d" -bg "#1a0010" -fg "#f1faee" \
-    "$NOTIFY_PID" "Memory forgetting started" &>/dev/null &
+    "$AGENT_TERMINAL_PID" "Memory forgetting started" &>/dev/null &
 fi
 
 # --- Score memories and find candidates ---
@@ -99,18 +100,6 @@ if [[ -z "$CANDIDATES" ]]; then
 fi
 log "Candidates: $(echo "$CANDIDATES" | tr '\n' ', ')"
 
-# --- Build notification instructions ---
-if [[ -n "$NOTIFY_PID" ]]; then
-  NOTIFY_INSTRUCTIONS="## End Notifications
-After you finish, send one notification per archived memory:
-  st-notify -t 45000 -b \"#ff6b9d\" -bg \"#1a0010\" -fg \"#f1faee\" ${NOTIFY_PID} \"Forgot memory/{name}.md\"
-
-If you archived nothing, send:
-  st-notify -t 45000 -b \"#ff6b9d\" -bg \"#1a0010\" -fg \"#f1faee\" ${NOTIFY_PID} \"Memory cleanup done — nothing archived\""
-else
-  NOTIFY_INSTRUCTIONS="## Notifications
-Notifications are disabled (no terminal PID available)."
-fi
 
 # --- Build user prompt ---
 read -r -d '' USER_PROMPT << PROMPT || true
@@ -125,16 +114,17 @@ You are the memory forgetting agent. Review the candidates below and decide whet
 Score  Name  Stats
 ${CANDIDATES}
 
+## Tools
+You have two tools available as Bash commands:
+- \`forget-memory memory/{name}.md\` — archives the memory and its metadata to memory-cold/
+- \`appreciate-memory memory/{name}.md <int>\` — bumps the memory's appreciation score by the given amount
+
 ## Your Task
 1. Read each candidate's content from memory/{name}.md.
 2. Decide for each:
-   - KEEP: If the memory contains critical, foundational, or hard-to-reconstruct information, bump its appreciation by +1 or +2 in its memory-metadata/{name}.json file.
-   - ARCHIVE: If the memory is low-value, outdated, or trivially reconstructable, move both files to cold storage:
-       mv ${AGENT_DIR}/memory/{name}.md ${AGENT_DIR}/memory-cold/{name}.md
-       mv ${AGENT_DIR}/memory-metadata/{name}.json ${AGENT_DIR}/memory-cold/{name}.json
+   - KEEP: If the memory contains critical, foundational, or hard-to-reconstruct information, run \`appreciate-memory memory/{name}.md 1\` (or 2 for especially valuable ones).
+   - ARCHIVE: If the memory is low-value, outdated, or trivially reconstructable, run \`forget-memory memory/{name}.md\`.
 3. Tell me your reasoning for each decision.
-
-${NOTIFY_INSTRUCTIONS}
 
 ## Guidelines
 - ERR ON THE SIDE OF KEEPING. Bumping appreciation is always preferred over archiving.
@@ -147,10 +137,10 @@ PROMPT
 log "Spawning forgetting agent..."
 STDERR_LOG=$(mktemp)
 RESULT=$(echo "$USER_PROMPT" | \
-  (cd /tmp && AGENT_HOOK_ID="" BLOCK_HOOK_AGENTS=1 timeout 900 claude -p \
+  (cd /tmp && PATH="${AGENT_DIR}/src/memory:$PATH" AGENT_HOOK_ID="" BLOCK_HOOK_AGENTS=1 timeout 900 claude -p \
     --model opus \
     --max-turns 30 \
-    --allowedTools "Read,Write,Glob,Bash(mv *),Bash(mkdir *),Bash(ls *),Bash(cd *),Bash(st-notify *),Bash(python3 *)" \
+    --allowedTools "Read,Glob,Bash(forget-memory *),Bash(appreciate-memory *)" \
     --no-session-persistence \
     2>"$STDERR_LOG")) || { log "Forgetting agent failed (exit $?)"; log "stderr: $(cat "$STDERR_LOG")"; rm -f "$STDERR_LOG"; exit 0; }
 

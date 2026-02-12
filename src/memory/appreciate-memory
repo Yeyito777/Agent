@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+# appreciate-memory — Bump a memory's appreciation score
+# Usage: appreciate-memory memory/<name>.md <int>
+set -euo pipefail
+
+AGENT_DIR="${CLAUDE_PROJECT_DIR:-.}"
+
+if [[ $# -ne 2 ]]; then
+  echo "Error: expected exactly 2 arguments." >&2
+  echo "Usage: appreciate-memory memory/<name>.md <int>" >&2
+  exit 1
+fi
+
+TARGET="$1"
+AMOUNT="$2"
+
+if [[ ! "$TARGET" =~ ^memory/[a-z0-9-]+\.md$ ]]; then
+  echo "Error: first argument must match 'memory/<kebab-case-name>.md'" >&2
+  echo "Got: $TARGET" >&2
+  exit 1
+fi
+
+if [[ ! "$AMOUNT" =~ ^[0-9]+$ ]] || [[ "$AMOUNT" -eq 0 ]]; then
+  echo "Error: second argument must be a positive integer" >&2
+  echo "Got: $AMOUNT" >&2
+  exit 1
+fi
+
+MEM_FILE="${AGENT_DIR}/${TARGET}"
+MEM_NAME=$(basename "$TARGET" .md)
+META_FILE="${AGENT_DIR}/memory-metadata/${MEM_NAME}.json"
+
+if [[ ! -f "$MEM_FILE" ]]; then
+  echo "Error: $TARGET does not exist" >&2
+  exit 1
+fi
+
+if [[ ! -f "$META_FILE" ]]; then
+  echo "Error: metadata file memory-metadata/${MEM_NAME}.json does not exist" >&2
+  exit 1
+fi
+
+NEW_SCORE=$(python3 -c "
+import json
+f = '${META_FILE}'
+with open(f) as fh: d = json.load(fh)
+d['appreciation'] = d.get('appreciation', 0) + ${AMOUNT}
+with open(f, 'w') as fh: json.dump(d, fh, indent=2); fh.write('\n')
+print(d['appreciation'])
+")
+echo "Bumped appreciation of ${TARGET} by +${AMOUNT} (now ${NEW_SCORE})"
+
+# Notify terminal
+if [[ -n "${AGENT_TERMINAL_PID:-}" ]] && command -v st-notify &>/dev/null; then
+  st-notify -t 45000 -b "#ff6b9d" -bg "#1a0010" -fg "#f1faee" \
+    "$AGENT_TERMINAL_PID" "Kept ${TARGET} (+${AMOUNT})" &>/dev/null || true
+fi

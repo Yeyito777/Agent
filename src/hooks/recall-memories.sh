@@ -170,7 +170,8 @@ if [[ ${#NEW_MEMORIES[@]} -gt 0 ]]; then
   if [[ -n "${AGENT_TERMINAL_PID:-}" ]] && command -v st-notify &>/dev/null; then
     for mem in "${NEW_MEMORIES[@]}"; do
       st-notify -t 15000 -ts 18 -b "#4ddbb7" -bg "#001a0f" -fg "#f1faee" \
-        "$AGENT_TERMINAL_PID" "recalled ${mem}" &>/dev/null &
+        "$AGENT_TERMINAL_PID" "recalled ${mem}" &>/dev/null
+      sleep 0.05
     done
     log "Sent ${#NEW_MEMORIES[@]} st-notify toasts to PID ${AGENT_TERMINAL_PID}"
   fi

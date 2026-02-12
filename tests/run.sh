@@ -71,9 +71,9 @@ MEMORY_UPDATE=off
 MEMORY_FORGETTING=on
 MEMORY_VALIDATION=on
 
-## Hook intervals (in sessions)
-MEMORY_FORGETTING_INTERVAL=200
-MEMORY_VALIDATION_INTERVAL=100
+## Schedules (offset/cycle — fires when session % cycle == offset)
+MEMORY_FORGETTING_SCHEDULE=0/200
+MEMORY_VALIDATION_SCHEDULE=75/100
 EOF
 }
 
@@ -184,6 +184,32 @@ assert_claude_not_invoked() {
   else
     echo -e "  ${RED}FAIL${RESET}  $name"
     echo "        mock claude should not have been invoked"
+    FAIL=$((FAIL + 1))
+  fi
+}
+
+assert_exit_code() {
+  local actual="$1" expected="$2" name="$3"
+  if [[ "$actual" -eq "$expected" ]]; then
+    echo -e "  ${GREEN}PASS${RESET}  $name"
+    PASS=$((PASS + 1))
+  else
+    echo -e "  ${RED}FAIL${RESET}  $name"
+    echo "        expected exit code: $expected"
+    echo "        actual exit code: $actual"
+    FAIL=$((FAIL + 1))
+  fi
+}
+
+assert_output_contains() {
+  local output="$1" pattern="$2" name="$3"
+  if echo "$output" | grep -qF "$pattern"; then
+    echo -e "  ${GREEN}PASS${RESET}  $name"
+    PASS=$((PASS + 1))
+  else
+    echo -e "  ${RED}FAIL${RESET}  $name"
+    echo "        expected output to contain: $pattern"
+    echo "        actual output: $output"
     FAIL=$((FAIL + 1))
   fi
 }
@@ -412,57 +438,230 @@ MOCK
 }
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# CUSTOM INTERVAL TESTS
+# MEMORY TOOL TESTS (forget-memory, appreciate-memory)
 # ═══════════════════════════════════════════════════════════════════════════════
 
-test_validation_custom_interval() {
-  # Set interval to 150 (must be > 75 since offset is 75) → fires at session % 150 == 75
-  sed -i 's/MEMORY_VALIDATION_INTERVAL=100/MEMORY_VALIDATION_INTERVAL=150/' "$TEST_DIR/agent.conf"
+run_tool() {
+  local tool="$1"
+  shift
+  CLAUDE_PROJECT_DIR="$TEST_DIR" AGENT_TERMINAL_PID="" \
+    "$TEST_DIR/src/memory/$tool" "$@" 2>&1
+}
+
+create_test_memory() {
+  local name="$1"
+  echo "Test memory — $name" > "$TEST_DIR/memory/${name}.md"
+  cat > "$TEST_DIR/memory-metadata/${name}.json" << EOF
+{
+  "frequency": 3,
+  "last_accessed_session": 10,
+  "created_session": 1,
+  "appreciation": 0,
+  "pinned": false
+}
+EOF
+}
+
+# --- forget-memory tests ---
+
+test_forget_memory_happy_path() {
+  create_test_memory "test-forget-target"
+  local out
+  out=$(run_tool forget-memory "memory/test-forget-target.md")
+  local rc=$?
+  assert_exit_code "$rc" 0 "exits 0 on success"
+  assert_output_contains "$out" "Archived memory/test-forget-target.md to memory-cold/" "prints archive message"
+  assert_file_exists "$TEST_DIR/memory-cold/test-forget-target.md" "memory moved to cold storage"
+  assert_file_exists "$TEST_DIR/memory-cold/test-forget-target.json" "metadata moved to cold storage"
+  assert_file_not_exists "$TEST_DIR/memory/test-forget-target.md" "memory removed from memory/"
+  assert_file_not_exists "$TEST_DIR/memory-metadata/test-forget-target.json" "metadata removed from memory-metadata/"
+  # cleanup
+  rm -f "$TEST_DIR/memory-cold/test-forget-target.md" "$TEST_DIR/memory-cold/test-forget-target.json"
+}
+
+test_forget_memory_no_args() {
+  local out rc
+  out=$(run_tool forget-memory) && rc=$? || rc=$?
+  assert_exit_code "$rc" 1 "exits 1 with no args"
+  assert_output_contains "$out" "Usage: forget-memory memory/" "shows usage"
+}
+
+test_forget_memory_wrong_format() {
+  local out rc
+  out=$(run_tool forget-memory "somefile.txt") && rc=$? || rc=$?
+  assert_exit_code "$rc" 1 "exits 1 with wrong format"
+  assert_output_contains "$out" "argument must match" "shows format error"
+}
+
+test_forget_memory_nonexistent() {
+  local out rc
+  out=$(run_tool forget-memory "memory/does-not-exist.md") && rc=$? || rc=$?
+  assert_exit_code "$rc" 1 "exits 1 for nonexistent file"
+  assert_output_contains "$out" "does not exist" "shows not-found error"
+}
+
+test_forget_memory_extra_args() {
+  local out rc
+  out=$(run_tool forget-memory "memory/foo.md" "extra") && rc=$? || rc=$?
+  assert_exit_code "$rc" 1 "exits 1 with extra args"
+  assert_output_contains "$out" "expected exactly 1 argument" "shows arg count error"
+}
+
+test_forget_memory_no_metadata() {
+  # Memory exists but metadata doesn't — should still archive the .md
+  echo "orphan memory" > "$TEST_DIR/memory/test-orphan.md"
+  rm -f "$TEST_DIR/memory-metadata/test-orphan.json"
+  local out
+  out=$(run_tool forget-memory "memory/test-orphan.md")
+  local rc=$?
+  assert_exit_code "$rc" 0 "exits 0 even without metadata"
+  assert_file_exists "$TEST_DIR/memory-cold/test-orphan.md" "memory moved to cold storage"
+  assert_file_not_exists "$TEST_DIR/memory-cold/test-orphan.json" "no metadata file created in cold storage"
+  # cleanup
+  rm -f "$TEST_DIR/memory-cold/test-orphan.md"
+}
+
+# --- appreciate-memory tests ---
+
+test_appreciate_memory_happy_path() {
+  create_test_memory "test-appreciate-target"
+  local out
+  out=$(run_tool appreciate-memory "memory/test-appreciate-target.md" 2)
+  local rc=$?
+  assert_exit_code "$rc" 0 "exits 0 on success"
+  assert_output_contains "$out" "Bumped appreciation of memory/test-appreciate-target.md by +2 (now 2)" "prints bump message"
+  # Verify JSON was updated
+  local appr
+  appr=$(python3 -c "import json; print(json.load(open('$TEST_DIR/memory-metadata/test-appreciate-target.json'))['appreciation'])")
+  if [[ "$appr" == "2" ]]; then
+    echo -e "  ${GREEN}PASS${RESET}  appreciation updated in metadata JSON"
+    PASS=$((PASS + 1))
+  else
+    echo -e "  ${RED}FAIL${RESET}  appreciation updated in metadata JSON"
+    echo "        expected: 2, actual: $appr"
+    FAIL=$((FAIL + 1))
+  fi
+  # cleanup
+  rm -f "$TEST_DIR/memory/test-appreciate-target.md" "$TEST_DIR/memory-metadata/test-appreciate-target.json"
+}
+
+test_appreciate_memory_stacks() {
+  create_test_memory "test-appreciate-stack"
+  run_tool appreciate-memory "memory/test-appreciate-stack.md" 1 > /dev/null
+  local out
+  out=$(run_tool appreciate-memory "memory/test-appreciate-stack.md" 3)
+  local rc=$?
+  assert_exit_code "$rc" 0 "exits 0 on second bump"
+  assert_output_contains "$out" "now 4" "appreciation stacks (1+3=4)"
+  # cleanup
+  rm -f "$TEST_DIR/memory/test-appreciate-stack.md" "$TEST_DIR/memory-metadata/test-appreciate-stack.json"
+}
+
+test_appreciate_memory_no_args() {
+  local out rc
+  out=$(run_tool appreciate-memory) && rc=$? || rc=$?
+  assert_exit_code "$rc" 1 "exits 1 with no args"
+  assert_output_contains "$out" "Usage: appreciate-memory memory/" "shows usage"
+}
+
+test_appreciate_memory_wrong_format() {
+  local out rc
+  out=$(run_tool appreciate-memory "somefile.txt" 1) && rc=$? || rc=$?
+  assert_exit_code "$rc" 1 "exits 1 with wrong format"
+  assert_output_contains "$out" "first argument must match" "shows format error"
+}
+
+test_appreciate_memory_nonexistent() {
+  local out rc
+  out=$(run_tool appreciate-memory "memory/does-not-exist.md" 1) && rc=$? || rc=$?
+  assert_exit_code "$rc" 1 "exits 1 for nonexistent file"
+  assert_output_contains "$out" "does not exist" "shows not-found error"
+}
+
+test_appreciate_memory_zero_amount() {
+  create_test_memory "test-appreciate-zero"
+  local out rc
+  out=$(run_tool appreciate-memory "memory/test-appreciate-zero.md" 0) && rc=$? || rc=$?
+  assert_exit_code "$rc" 1 "exits 1 with zero amount"
+  assert_output_contains "$out" "must be a positive integer" "shows integer error"
+  # cleanup
+  rm -f "$TEST_DIR/memory/test-appreciate-zero.md" "$TEST_DIR/memory-metadata/test-appreciate-zero.json"
+}
+
+test_appreciate_memory_non_integer() {
+  create_test_memory "test-appreciate-nan"
+  local out rc
+  out=$(run_tool appreciate-memory "memory/test-appreciate-nan.md" "abc") && rc=$? || rc=$?
+  assert_exit_code "$rc" 1 "exits 1 with non-integer"
+  assert_output_contains "$out" "must be a positive integer" "shows integer error for string"
+  # cleanup
+  rm -f "$TEST_DIR/memory/test-appreciate-nan.md" "$TEST_DIR/memory-metadata/test-appreciate-nan.json"
+}
+
+test_appreciate_memory_no_metadata() {
+  echo "orphan memory" > "$TEST_DIR/memory/test-no-meta.md"
+  rm -f "$TEST_DIR/memory-metadata/test-no-meta.json"
+  local out rc
+  out=$(run_tool appreciate-memory "memory/test-no-meta.md" 1) && rc=$? || rc=$?
+  assert_exit_code "$rc" 1 "exits 1 without metadata"
+  assert_output_contains "$out" "metadata file" "shows metadata error"
+  # cleanup
+  rm -f "$TEST_DIR/memory/test-no-meta.md"
+}
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# CUSTOM SCHEDULE TESTS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+test_validation_custom_schedule() {
+  # Set schedule to 75/150 → fires at session % 150 == 75
+  sed -i 's/MEMORY_VALIDATION_SCHEDULE=75\/100/MEMORY_VALIDATION_SCHEDULE=75\/150/' "$TEST_DIR/agent.conf"
   echo "225" > "$TEST_DIR/runtime/session-counter"
   echo "75" > "$TEST_DIR/runtime/last-validation-session"
   run_hook validation-memories.sh
-  assert_log_contains "Validation agent triggered (session 225)" "triggers with custom interval 150 at session 225"
+  assert_log_contains "Validation agent triggered (session 225)" "triggers with custom schedule 75/150 at session 225"
   assert_claude_invoked "claude was spawned"
 }
 
-test_validation_custom_interval_skip() {
-  sed -i 's/MEMORY_VALIDATION_INTERVAL=100/MEMORY_VALIDATION_INTERVAL=150/' "$TEST_DIR/agent.conf"
+test_validation_custom_schedule_skip() {
+  sed -i 's/MEMORY_VALIDATION_SCHEDULE=75\/100/MEMORY_VALIDATION_SCHEDULE=75\/150/' "$TEST_DIR/agent.conf"
   echo "100" > "$TEST_DIR/runtime/session-counter"
   run_hook validation-memories.sh
-  assert_log_contains "SKIP: session 100 is not 75 mod 150" "skips non-matching session with custom interval"
+  assert_log_contains "SKIP: session 100 is not 75 mod 150" "skips non-matching session with custom schedule"
   assert_claude_not_invoked "claude not spawned"
 }
 
-test_forgetting_custom_interval() {
-  sed -i 's/MEMORY_FORGETTING_INTERVAL=200/MEMORY_FORGETTING_INTERVAL=50/' "$TEST_DIR/agent.conf"
+test_forgetting_custom_schedule() {
+  # Set schedule to 0/50 → fires at session % 50 == 0
+  sed -i 's/MEMORY_FORGETTING_SCHEDULE=0\/200/MEMORY_FORGETTING_SCHEDULE=0\/50/' "$TEST_DIR/agent.conf"
   echo "100" > "$TEST_DIR/runtime/session-counter"
   echo "50" > "$TEST_DIR/runtime/last-forgetting-session"
   run_hook forgetting-memories.sh
-  assert_log_contains "Forgetting agent triggered (session 100)" "triggers with custom interval 50 at session 100"
+  assert_log_contains "Forgetting agent triggered (session 100)" "triggers with custom schedule 0/50 at session 100"
   assert_claude_invoked "claude was spawned"
 }
 
-test_forgetting_custom_interval_skip() {
-  sed -i 's/MEMORY_FORGETTING_INTERVAL=200/MEMORY_FORGETTING_INTERVAL=50/' "$TEST_DIR/agent.conf"
+test_forgetting_custom_schedule_skip() {
+  sed -i 's/MEMORY_FORGETTING_SCHEDULE=0\/200/MEMORY_FORGETTING_SCHEDULE=0\/50/' "$TEST_DIR/agent.conf"
   echo "30" > "$TEST_DIR/runtime/session-counter"
   run_hook forgetting-memories.sh
-  assert_log_contains "SKIP: session 30 is not 0 mod 50" "skips non-matching session with custom interval"
+  assert_log_contains "SKIP: session 30 is not 0 mod 50" "skips non-matching session with custom schedule"
   assert_claude_not_invoked "claude not spawned"
 }
 
-test_interval_defaults_when_missing() {
-  # Remove interval lines from agent.conf — hooks should fall back to defaults
-  sed -i '/MEMORY_FORGETTING_INTERVAL/d' "$TEST_DIR/agent.conf"
-  sed -i '/MEMORY_VALIDATION_INTERVAL/d' "$TEST_DIR/agent.conf"
+test_schedule_defaults_when_missing() {
+  # Remove schedule lines from agent.conf — hooks should fall back to defaults
+  sed -i '/MEMORY_FORGETTING_SCHEDULE/d' "$TEST_DIR/agent.conf"
+  sed -i '/MEMORY_VALIDATION_SCHEDULE/d' "$TEST_DIR/agent.conf"
   echo "150" > "$TEST_DIR/runtime/session-counter"
   run_hook forgetting-memories.sh
-  assert_log_contains "SKIP: session 150 is not 0 mod 200" "forgetting defaults to 200 when config missing"
+  assert_log_contains "SKIP: session 150 is not 0 mod 200" "forgetting defaults to 0/200 when config missing"
   reset_state
-  sed -i '/MEMORY_FORGETTING_INTERVAL/d' "$TEST_DIR/agent.conf"
-  sed -i '/MEMORY_VALIDATION_INTERVAL/d' "$TEST_DIR/agent.conf"
+  sed -i '/MEMORY_FORGETTING_SCHEDULE/d' "$TEST_DIR/agent.conf"
+  sed -i '/MEMORY_VALIDATION_SCHEDULE/d' "$TEST_DIR/agent.conf"
   echo "80" > "$TEST_DIR/runtime/session-counter"
   run_hook validation-memories.sh
-  assert_log_contains "SKIP: session 80 is not 75 mod 100" "validation defaults to 100 when config missing"
+  assert_log_contains "SKIP: session 80 is not 75 mod 100" "validation defaults to 75/100 when config missing"
 }
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -532,12 +731,28 @@ run_test "forgetting: recursion guard"                   test_forgetting_recursi
 run_test "forgetting: no session counter"                test_forgetting_no_session_counter
 run_test "forgetting: lock written before spawn"         test_forgetting_lock_written_before_spawn
 
-# Custom interval tests
-run_test "validation: custom interval triggers"          test_validation_custom_interval
-run_test "validation: custom interval skips"             test_validation_custom_interval_skip
-run_test "forgetting: custom interval triggers"          test_forgetting_custom_interval
-run_test "forgetting: custom interval skips"             test_forgetting_custom_interval_skip
-run_test "intervals: defaults when config missing"       test_interval_defaults_when_missing
+# Memory tool tests
+run_test "forget-memory: happy path"                     test_forget_memory_happy_path
+run_test "forget-memory: no args"                        test_forget_memory_no_args
+run_test "forget-memory: wrong format"                   test_forget_memory_wrong_format
+run_test "forget-memory: nonexistent file"               test_forget_memory_nonexistent
+run_test "forget-memory: extra args"                     test_forget_memory_extra_args
+run_test "forget-memory: no metadata"                    test_forget_memory_no_metadata
+run_test "appreciate-memory: happy path"                 test_appreciate_memory_happy_path
+run_test "appreciate-memory: stacks"                     test_appreciate_memory_stacks
+run_test "appreciate-memory: no args"                    test_appreciate_memory_no_args
+run_test "appreciate-memory: wrong format"               test_appreciate_memory_wrong_format
+run_test "appreciate-memory: nonexistent file"           test_appreciate_memory_nonexistent
+run_test "appreciate-memory: zero amount"                test_appreciate_memory_zero_amount
+run_test "appreciate-memory: non-integer amount"         test_appreciate_memory_non_integer
+run_test "appreciate-memory: no metadata"                test_appreciate_memory_no_metadata
+
+# Custom schedule tests
+run_test "validation: custom schedule triggers"          test_validation_custom_schedule
+run_test "validation: custom schedule skips"             test_validation_custom_schedule_skip
+run_test "forgetting: custom schedule triggers"          test_forgetting_custom_schedule
+run_test "forgetting: custom schedule skips"             test_forgetting_custom_schedule_skip
+run_test "schedules: defaults when config missing"       test_schedule_defaults_when_missing
 
 # Cross-hook tests
 run_test "cross-hook: no schedule collision"             test_no_schedule_collision

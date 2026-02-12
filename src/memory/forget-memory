@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+# forget-memory — Archive a memory file to cold storage
+# Usage: forget-memory memory/<name>.md
+set -euo pipefail
+
+AGENT_DIR="${CLAUDE_PROJECT_DIR:-.}"
+
+if [[ $# -ne 1 ]]; then
+  echo "Error: expected exactly 1 argument." >&2
+  echo "Usage: forget-memory memory/<name>.md" >&2
+  exit 1
+fi
+
+TARGET="$1"
+
+if [[ ! "$TARGET" =~ ^memory/[a-z0-9-]+\.md$ ]]; then
+  echo "Error: argument must match 'memory/<kebab-case-name>.md'" >&2
+  echo "Got: $TARGET" >&2
+  exit 1
+fi
+
+MEM_FILE="${AGENT_DIR}/${TARGET}"
+MEM_NAME=$(basename "$TARGET" .md)
+META_FILE="${AGENT_DIR}/memory-metadata/${MEM_NAME}.json"
+COLD_DIR="${AGENT_DIR}/memory-cold"
+
+if [[ ! -f "$MEM_FILE" ]]; then
+  echo "Error: $TARGET does not exist" >&2
+  exit 1
+fi
+
+mkdir -p "$COLD_DIR"
+mv "$MEM_FILE" "${COLD_DIR}/${MEM_NAME}.md"
+[[ -f "$META_FILE" ]] && mv "$META_FILE" "${COLD_DIR}/${MEM_NAME}.json"
+
+echo "Archived $TARGET to memory-cold/"
+
+# Notify terminal
+if [[ -n "${AGENT_TERMINAL_PID:-}" ]] && command -v st-notify &>/dev/null; then
+  st-notify -t 45000 -b "#ff6b9d" -bg "#1a0010" -fg "#f1faee" \
+    "$AGENT_TERMINAL_PID" "Forgot ${TARGET}" &>/dev/null || true
+fi
