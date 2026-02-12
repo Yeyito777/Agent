@@ -1,4 +1,4 @@
-Qutebrowser fork with custom QtWebEngine/Chromium build — source at ~/Workspace/Qutebrowser/, submodule chain (qtwebengine, chromium, pyqt6-webengine SIP bindings), install.sh build workflow, ladder-commit, reference docs (element shader, web settings, hinting, native elements), pytest testing. For runtime config see qutebrowser-runtime.md
+Qutebrowser fork with custom QtWebEngine/Chromium build — source at ~/Workspace/Qutebrowser/, submodule chain (qtwebengine, chromium, pyqt6-webengine SIP bindings), install.sh build workflow, ladder-commit, reference docs (element shader, web settings, hinting, native elements, dwm-persist), dwm persist integration (_DWM_SAVE_ARGV), pytest testing. For runtime config see qutebrowser-runtime.md
 
 # Location
 - Source: `/home/yeyito/Workspace/Qutebrowser/`
@@ -41,6 +41,7 @@ Located in `reference/` directory — read these before touching related feature
 - `hinting.md` — hinting system internals (user input → element selection → action)
 - `javascript-hinting.md` — JavaScript hint target system
 - `native-elements.md` — NativeTheme, Chromium native form controls (checkboxes, radios, etc.), Skia rendering
+- `dwm-persist.md` — dwm persist mode integration, `_DWM_SAVE_ARGV` X11 property registration from `showEvent()`
 
 # Building
 | Command | Purpose |
@@ -65,7 +66,9 @@ QT_QPA_PLATFORM=offscreen PYTHONPATH=. pytest tests/unit/path/to/test.py -v
 
 # Critical Workflow Notes
 - **Do NOT run git commands** (commit, push, checkout, etc.) unless explicitly instructed. User manages git manually.
-- **After editing Blink/QtWebEngine C++ files**, always run `./install.sh --dirty` to build and install immediately.
+- **Always install after code changes** so the user can test immediately.
+  - **Python-only changes**: run `./install.sh`
+  - **C++ (Blink/QtWebEngine) changes**: run `./install.sh --dirty`
 
 ---
 Update this memory when qutebrowser's submodule structure, build process, reference docs, or workflow changes.

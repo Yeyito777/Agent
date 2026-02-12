@@ -1,0 +1,24 @@
+The memory file has been verified and updated. Here's what the subagent found:
+
+**File checked:** `/home/yeyito/Workspace/Agent/memory/modifying-agent-src.md`
+
+### Verification Results (10 claims checked):
+
+All referenced files, hooks, and aliases were verified against their actual sources (`.claude/settings.local.json`, `~/.zshrc`, `start.sh`, etc.).
+
+### Changes made:
+
+1. **Removed `refresh_pointers.py` from the description** — The file no longer exists in the project, and the call in `start.sh` is commented out.
+2. **Added `hooks/validation-memories.sh` to the External References table** — This hook exists and is wired as a SessionStart hook in `settings.local.json` but was missing from the memory.
+3. **Updated `reconcile_metadata.py` line reference from ~50 to ~44** — The actual call is on line 44 of `start.sh`.
+
+Everything else was confirmed accurate and left untouched.
+
+(The Lua diagnostics in the system reminder are unrelated to this task — they appear to be from a separate language server running in your editor.)
+Done. Updated the first line of `/home/yeyito/Workspace/Agent/memory/modifying-agent-src.md`. Key improvements:
+
+- Added explicit action verbs users might search for: "renaming", "moving", "deleting"
+- Spelled out all five hook script names for better keyword matching
+- Added "boot flow" as a synonym alongside "startup"
+- Added "hooks wiring" and "keeping paths in sync" as concepts users might phrase queries around
+- Kept it as a single plaintext line with no markdown formatting

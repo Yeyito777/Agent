@@ -1,26 +1,40 @@
 #!/usr/bin/env bash
-# forgetting-memories.sh — SessionStart hook (async)
+# forgetting-memories.sh — SessionStart hook (async) / manual via --force
 # Checks if enough sessions have passed since last cleanup,
 # and if so, spawns the forgetting agent to review low-scoring memories.
+# Usage: forgetting-memories.sh [--force [count]]
 
 set -euo pipefail
 
-# --- Skip nested calls ---
-if [[ -n "${BLOCK_HOOK_AGENTS:-}" ]]; then
-  cat > /dev/null
-  exit 0
+FORCE=false
+FORCE_COUNT=""
+for arg in "$@"; do
+  case "$arg" in
+    --force) FORCE=true ;;
+    *) FORCE_COUNT="$arg" ;;
+  esac
+done
+
+# --- When run as a hook (no --force): gating logic ---
+if [[ "$FORCE" == false ]]; then
+  # Skip nested calls
+  if [[ -n "${BLOCK_HOOK_AGENTS:-}" ]]; then
+    cat > /dev/null
+    exit 0
+  fi
+
+  # Check agent.conf toggle
+  CONF="${CLAUDE_PROJECT_DIR:-}/agent.conf"
+  if [[ -f "$CONF" ]] && grep -qx 'MEMORY_FORGETTING=off' "$CONF"; then
+    cat > /dev/null
+    exit 0
+  fi
+
+  cat > /dev/null  # consume stdin
 fi
 
-# --- Check agent.conf toggle ---
-CONF="${CLAUDE_PROJECT_DIR:-}/agent.conf"
-if [[ -f "$CONF" ]] && grep -qx 'MEMORY_FORGETTING=off' "$CONF"; then
-  cat > /dev/null
-  exit 0
-fi
-
-cat > /dev/null  # consume stdin
-
-AGENT_DIR="$CLAUDE_PROJECT_DIR"
+AGENT_DIR="${CLAUDE_PROJECT_DIR:-/home/yeyito/Workspace/Agent}"
+CONF="${AGENT_DIR}/agent.conf"
 LOG="${AGENT_DIR}/runtime/hook-${AGENT_HOOK_ID:-none}.log"
 log() { echo "[$(date +%H:%M:%S)] [forgetting] $*" >> "$LOG" 2>/dev/null; }
 
@@ -28,49 +42,60 @@ log "--- Forgetting hook fired ---"
 
 # --- Read current session ---
 SESSION_FILE="${AGENT_DIR}/runtime/session-counter"
-if [[ ! -f "$SESSION_FILE" ]]; then
-  log "SKIP: session counter not found"
-  exit 0
-fi
-CURRENT_SESSION=$(cat "$SESSION_FILE")
+CURRENT_SESSION=$(cat "$SESSION_FILE" 2>/dev/null || echo "manual")
 
-# --- Read schedule from agent.conf (default: 0/200) ---
-FORGETTING_SCHEDULE=$(grep '^MEMORY_FORGETTING_SCHEDULE=' "$CONF" 2>/dev/null | cut -d= -f2 || true)
-FORGETTING_SCHEDULE="${FORGETTING_SCHEDULE:-0/200}"
-FORGETTING_OFFSET="${FORGETTING_SCHEDULE%%/*}"
-FORGETTING_CYCLE="${FORGETTING_SCHEDULE##*/}"
+if [[ "$FORCE" == false ]]; then
+  if [[ "$CURRENT_SESSION" == "manual" ]]; then
+    log "SKIP: session counter not found"
+    exit 0
+  fi
 
-# --- Check if cleanup is due ---
-if (( CURRENT_SESSION % FORGETTING_CYCLE != FORGETTING_OFFSET )); then
-  log "SKIP: session $CURRENT_SESSION is not $FORGETTING_OFFSET mod $FORGETTING_CYCLE"
-  exit 0
-fi
+  # Read schedule from agent.conf (default: 0/200)
+  FORGETTING_SCHEDULE=$(grep '^MEMORY_FORGETTING_SCHEDULE=' "$CONF" 2>/dev/null | cut -d= -f2 || true)
+  FORGETTING_SCHEDULE="${FORGETTING_SCHEDULE:-0/200}"
+  FORGETTING_OFFSET="${FORGETTING_SCHEDULE%%/*}"
+  FORGETTING_CYCLE="${FORGETTING_SCHEDULE##*/}"
 
-LAST_FILE="${AGENT_DIR}/runtime/last-forgetting-session"
-if [[ -f "$LAST_FILE" ]] && [[ "$(cat "$LAST_FILE")" == "$CURRENT_SESSION" ]]; then
-  log "SKIP: already ran for session $CURRENT_SESSION"
-  exit 0
-fi
+  # Check if cleanup is due
+  if (( CURRENT_SESSION % FORGETTING_CYCLE != FORGETTING_OFFSET )); then
+    log "SKIP: session $CURRENT_SESSION is not $FORGETTING_OFFSET mod $FORGETTING_CYCLE"
+    exit 0
+  fi
 
-# First time — set baseline, don't run cleanup yet
-if [[ ! -f "$LAST_FILE" ]]; then
+  LAST_FILE="${AGENT_DIR}/runtime/last-forgetting-session"
+  if [[ -f "$LAST_FILE" ]] && [[ "$(cat "$LAST_FILE")" == "$CURRENT_SESSION" ]]; then
+    log "SKIP: already ran for session $CURRENT_SESSION"
+    exit 0
+  fi
+
+  # First time — set baseline, don't run
+  if [[ ! -f "$LAST_FILE" ]]; then
+    echo "$CURRENT_SESSION" > "$LAST_FILE"
+    log "Initialized last-forgetting-session at session $CURRENT_SESSION"
+    exit 0
+  fi
+
+  # Mark cleanup (lock before spawning)
   echo "$CURRENT_SESSION" > "$LAST_FILE"
-  log "Initialized last-forgetting-session at session $CURRENT_SESSION"
-  exit 0
 fi
 
 log "--- Forgetting agent triggered (session $CURRENT_SESSION) ---"
 
-# --- Mark cleanup ---
-echo "$CURRENT_SESSION" > "$LAST_FILE"
+# --- Forgetting log file ---
+mkdir -p "${AGENT_DIR}/logs"
+FLOG="${AGENT_DIR}/logs/forgetting-${CURRENT_SESSION}.log"
 
 # --- Start notification ---
 if [[ -n "${AGENT_TERMINAL_PID:-}" ]] && command -v st-notify &>/dev/null; then
-  st-notify -t 45000 -b "#ff6b9d" -bg "#1a0010" -fg "#f1faee" \
-    "$AGENT_TERMINAL_PID" "Memory forgetting started" &>/dev/null &
+  st-notify -t 16000 -ts 18 -b "#ff6b9d" -bg "#1a0010" -fg "#f1faee" \
+    "$AGENT_TERMINAL_PID" "Memory cleanup started" &>/dev/null &
 fi
 
 # --- Score memories and find candidates ---
+DEFAULT_CANDIDATES=$(grep '^MEMORY_FORGETTING_CANDIDATES=' "$CONF" 2>/dev/null | cut -d= -f2 || true)
+DEFAULT_CANDIDATES="${DEFAULT_CANDIDATES:-3}"
+FORGETTING_CANDIDATES="${FORCE_COUNT:-$DEFAULT_CANDIDATES}"
+
 log "Scoring memories..."
 CANDIDATES=$(python3 -c "
 import json, math
@@ -89,7 +114,7 @@ for f in sorted(metadata_dir.glob('*.json')):
     score = math.log2(1 + freq) * math.exp(-0.003466 * sessions_since) + appreciation
     scores.append((score, f.stem, d))
 scores.sort()
-for score, name, d in scores[:3]:
+for score, name, d in scores[:${FORGETTING_CANDIDATES}]:
     print('{:.4f}  {}  freq={} last={} appr={}'.format(
         score, name, d['frequency'], d['last_accessed_session'], d['appreciation']))
 " 2>/dev/null) || { log "SKIP: scoring failed"; exit 0; }
@@ -136,19 +161,19 @@ PROMPT
 # --- Spawn forgetting agent ---
 log "Spawning forgetting agent..."
 STDERR_LOG=$(mktemp)
-RESULT=$(echo "$USER_PROMPT" | \
+echo "$USER_PROMPT" | \
   (cd /tmp && PATH="${AGENT_DIR}/src/memory:$PATH" AGENT_HOOK_ID="" BLOCK_HOOK_AGENTS=1 timeout 900 claude -p \
     --model opus \
     --max-turns 30 \
     --allowedTools "Read,Glob,Bash(forget-memory *),Bash(appreciate-memory *)" \
     --no-session-persistence \
-    2>"$STDERR_LOG")) || { log "Forgetting agent failed (exit $?)"; log "stderr: $(cat "$STDERR_LOG")"; rm -f "$STDERR_LOG"; exit 0; }
+    2>"$STDERR_LOG") >> "$FLOG" || { log "Forgetting agent failed (exit $?)"; log "stderr: $(cat "$STDERR_LOG")"; rm -f "$STDERR_LOG"; exit 0; }
 
 if [[ -s "$STDERR_LOG" ]]; then
   log "stderr: $(cat "$STDERR_LOG")"
 fi
 rm -f "$STDERR_LOG"
-log "Forgetting agent output: ${RESULT:0:500}"
+log "Forgetting agent done (output in $FLOG)"
 log "--- Forgetting hook done ---"
 
 exit 0

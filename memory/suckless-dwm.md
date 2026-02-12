@@ -33,9 +33,10 @@ No need for `make clean` — just `make && sudo make install`.
 
 # Persist Mode (`--persist` / `-p`)
 `dwm -p` saves/restores windows across restarts via `~/.runtime/dwm/`.
-- Programs opt in by setting `_DWM_SAVE_ARGV` X11 property (via `dwm-save` script or `xprop`)
+- Programs opt in by setting `_DWM_SAVE_ARGV` X11 property (any string type — `STRING` or `UTF8_STRING`)
+- dwm reads the property in two places: `manage()` (catches pre-existing properties) and `propertynotify()` (catches later changes) — both use `AnyPropertyType`
 - dwm writes `.save` files (argv + metadata) in numbered tag dirs (`1/`, `2/`, ...)
-- On window death (`unmanage()`), the `.save` file is removed
+- On window death while running (`unmanage()` with `running == 1`), the `.save` file is removed; during shutdown (`running == 0`), save files are preserved for restore
 - On restore startup: backs up to `dwm-backup/`, reads `.save` files, spawns programs, deletes files (programs re-register themselves)
 - SIGTERM handler for clean shutdown; liveness pruning on quit
 - See `reference/persist-mode.md` and `reference/dwm-save.md` for full details

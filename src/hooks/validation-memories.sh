@@ -1,26 +1,39 @@
 #!/usr/bin/env bash
-# validation-memories.sh — SessionStart hook (async)
-# Every 100 sessions (at 75 mod 100), selects up to 20 random memories,
+# validation-memories.sh — SessionStart hook (async) / manual via --force
+# At schedule 75/100 (session % 100 == 75), selects up to 20 random memories,
 # validates their content via subagents, then updates their descriptors.
+# Usage: validation-memories.sh [--force [count]]
 
 set -euo pipefail
 
-# --- Skip nested calls ---
-if [[ -n "${BLOCK_HOOK_AGENTS:-}" ]]; then
-  cat > /dev/null
-  exit 0
+FORCE=false
+FORCE_COUNT=""
+for arg in "$@"; do
+  case "$arg" in
+    --force) FORCE=true ;;
+    *) FORCE_COUNT="$arg" ;;
+  esac
+done
+
+# --- When run as a hook (no --force): gating logic ---
+if [[ "$FORCE" == false ]]; then
+  # Skip nested calls
+  if [[ -n "${BLOCK_HOOK_AGENTS:-}" ]]; then
+    cat > /dev/null
+    exit 0
+  fi
+
+  # Check agent.conf toggle
+  CONF="${CLAUDE_PROJECT_DIR:-}/agent.conf"
+  if [[ -f "$CONF" ]] && grep -qx 'MEMORY_VALIDATION=off' "$CONF"; then
+    cat > /dev/null
+    exit 0
+  fi
+
+  cat > /dev/null  # consume stdin
 fi
 
-# --- Check agent.conf toggle ---
-CONF="${CLAUDE_PROJECT_DIR:-}/agent.conf"
-if [[ -f "$CONF" ]] && grep -qx 'MEMORY_VALIDATION=off' "$CONF"; then
-  cat > /dev/null
-  exit 0
-fi
-
-cat > /dev/null  # consume stdin
-
-AGENT_DIR="$CLAUDE_PROJECT_DIR"
+AGENT_DIR="${CLAUDE_PROJECT_DIR:-/home/yeyito/Workspace/Agent}"
 LOG="${AGENT_DIR}/runtime/hook-${AGENT_HOOK_ID:-none}.log"
 log() { echo "[$(date +%H:%M:%S)] [validation] $*" >> "$LOG" 2>/dev/null; }
 
@@ -28,56 +41,72 @@ log "--- Validation hook fired ---"
 
 # --- Read current session ---
 SESSION_FILE="${AGENT_DIR}/runtime/session-counter"
-if [[ ! -f "$SESSION_FILE" ]]; then
-  log "SKIP: session counter not found"
-  exit 0
-fi
-CURRENT_SESSION=$(cat "$SESSION_FILE")
+CURRENT_SESSION=$(cat "$SESSION_FILE" 2>/dev/null || echo "manual")
 
-# --- Read interval from agent.conf (default: 100) ---
-VALIDATION_INTERVAL=$(grep '^MEMORY_VALIDATION_INTERVAL=' "$CONF" 2>/dev/null | cut -d= -f2 || true)
-VALIDATION_INTERVAL="${VALIDATION_INTERVAL:-100}"
+if [[ "$FORCE" == false ]]; then
+  if [[ "$CURRENT_SESSION" == "manual" ]]; then
+    log "SKIP: session counter not found"
+    exit 0
+  fi
 
-# --- Check if validation is due (fires at 75 mod interval) ---
-if (( CURRENT_SESSION % VALIDATION_INTERVAL != 75 )); then
-  log "SKIP: session $CURRENT_SESSION is not 75 mod $VALIDATION_INTERVAL"
-  exit 0
-fi
+  # Read schedule from agent.conf (default: 75/100)
+  CONF="${CLAUDE_PROJECT_DIR:-}/agent.conf"
+  VALIDATION_SCHEDULE=$(grep '^MEMORY_VALIDATION_SCHEDULE=' "$CONF" 2>/dev/null | cut -d= -f2 || true)
+  VALIDATION_SCHEDULE="${VALIDATION_SCHEDULE:-75/100}"
+  VALIDATION_OFFSET="${VALIDATION_SCHEDULE%%/*}"
+  VALIDATION_CYCLE="${VALIDATION_SCHEDULE##*/}"
 
-# --- Lock mechanism ---
-LAST_FILE="${AGENT_DIR}/runtime/last-validation-session"
-if [[ -f "$LAST_FILE" ]] && [[ "$(cat "$LAST_FILE")" == "$CURRENT_SESSION" ]]; then
-  log "SKIP: already ran for session $CURRENT_SESSION"
-  exit 0
-fi
+  # Check if validation is due
+  if (( CURRENT_SESSION % VALIDATION_CYCLE != VALIDATION_OFFSET )); then
+    log "SKIP: session $CURRENT_SESSION is not $VALIDATION_OFFSET mod $VALIDATION_CYCLE"
+    exit 0
+  fi
 
-# First time — set baseline, don't run
-if [[ ! -f "$LAST_FILE" ]]; then
+  # Lock mechanism
+  LAST_FILE="${AGENT_DIR}/runtime/last-validation-session"
+  if [[ -f "$LAST_FILE" ]] && [[ "$(cat "$LAST_FILE")" == "$CURRENT_SESSION" ]]; then
+    log "SKIP: already ran for session $CURRENT_SESSION"
+    exit 0
+  fi
+
+  # First time — set baseline, don't run
+  if [[ ! -f "$LAST_FILE" ]]; then
+    echo "$CURRENT_SESSION" > "$LAST_FILE"
+    log "Initialized last-validation-session at session $CURRENT_SESSION"
+    exit 0
+  fi
+
+  # Mark validation (lock before spawning)
   echo "$CURRENT_SESSION" > "$LAST_FILE"
-  log "Initialized last-validation-session at session $CURRENT_SESSION"
-  exit 0
 fi
 
 log "--- Validation agent triggered (session $CURRENT_SESSION) ---"
 
-# --- Mark validation (lock before spawning) ---
-echo "$CURRENT_SESSION" > "$LAST_FILE"
+# --- Validation log file ---
+mkdir -p "${AGENT_DIR}/logs"
+VLOG="${AGENT_DIR}/logs/validation-${CURRENT_SESSION}.log"
 
 # --- Start notification ---
 NOTIFY_PID="${AGENT_TERMINAL_PID:-}"
 if [[ -n "$NOTIFY_PID" ]] && command -v st-notify &>/dev/null; then
-  st-notify -t 45000 -b "#6bcfff" -bg "#001a2e" -fg "#f1faee" \
+  st-notify -t 45000 -ts 18 -b "#6bcfff" -bg "#001a2e" -fg "#f1faee" \
     "$NOTIFY_PID" "Memory validation started" &>/dev/null &
 fi
 
-# --- Select up to 20 random memories ---
+# --- Select random memories ---
+CONF="${CLAUDE_PROJECT_DIR:-}/agent.conf"
+DEFAULT_AMOUNT=$(grep '^MEMORY_VALIDATION_AMOUNT=' "$CONF" 2>/dev/null | cut -d= -f2 || true)
+DEFAULT_AMOUNT="${DEFAULT_AMOUNT:-20}"
+MEM_COUNT="${FORCE_COUNT:-$DEFAULT_AMOUNT}"
 SELECTED_FILES=$(python3 -c "
 import random
 from pathlib import Path
 d = Path('${AGENT_DIR}/memory')
 files = sorted(d.glob('*.md'))
 random.shuffle(files)
-for f in files[:20]:
+limit = int('${MEM_COUNT}')
+sel = files if limit == 0 else files[:limit]
+for f in sel:
     print(str(f))
 " 2>/dev/null) || { log "SKIP: memory selection failed"; exit 0; }
 
@@ -95,8 +124,6 @@ FILE_LIST=$(echo "$SELECTED_FILES" | sed 's/^/- /')
 
 # --- Agent 1: Content validation ---
 log "Spawning content validation agent..."
-
-VALIDATION_DATE=$(date +"%Y-%m-%dT%H%M%SZ")
 
 read -r -d '' VALIDATION_PROMPT << VPROMPT || true
 Spawn a subagent for every file in here:
@@ -136,22 +163,21 @@ Rules:
 - Log which memories you checked and what (if anything) you changed, as a summary at the end
 \`\`\`
 
-Once all subagents finish, log what happened in ${AGENT_DIR}/logs/ in a file called: memory-validation-${VALIDATION_DATE}.md
 VPROMPT
 
 STDERR_LOG=$(mktemp)
-RESULT=$(echo "$VALIDATION_PROMPT" | \
+echo "$VALIDATION_PROMPT" | \
   (cd /tmp && AGENT_HOOK_ID="" BLOCK_HOOK_AGENTS=1 claude -p \
     --model opus \
     --dangerously-skip-permissions \
     --no-session-persistence \
-    2>"$STDERR_LOG")) || { log "Content validation agent failed (exit $?)"; log "stderr: $(cat "$STDERR_LOG")"; rm -f "$STDERR_LOG"; }
+    2>"$STDERR_LOG") >> "$VLOG" || { log "Content validation agent failed (exit $?)"; log "stderr: $(cat "$STDERR_LOG")"; rm -f "$STDERR_LOG"; }
 
 if [[ -s "${STDERR_LOG:-}" ]]; then
   log "validation stderr: $(cat "$STDERR_LOG")"
 fi
 rm -f "$STDERR_LOG"
-log "Content validation done: ${RESULT:0:500}"
+log "Content validation done (output in $VLOG)"
 
 # --- Agent 2: Descriptor update ---
 log "Spawning descriptor update agent..."
@@ -185,22 +211,22 @@ Process:
 DPROMPT
 
 STDERR_LOG=$(mktemp)
-RESULT=$(echo "$DESCRIPTOR_PROMPT" | \
+echo "$DESCRIPTOR_PROMPT" | \
   (cd /tmp && AGENT_HOOK_ID="" BLOCK_HOOK_AGENTS=1 claude -p \
     --model opus \
     --dangerously-skip-permissions \
     --no-session-persistence \
-    2>"$STDERR_LOG")) || { log "Descriptor update agent failed (exit $?)"; log "stderr: $(cat "$STDERR_LOG")"; rm -f "$STDERR_LOG"; }
+    2>"$STDERR_LOG") >> "$VLOG" || { log "Descriptor update agent failed (exit $?)"; log "stderr: $(cat "$STDERR_LOG")"; rm -f "$STDERR_LOG"; }
 
 if [[ -s "${STDERR_LOG:-}" ]]; then
   log "descriptor stderr: $(cat "$STDERR_LOG")"
 fi
 rm -f "$STDERR_LOG"
-log "Descriptor update done: ${RESULT:0:500}"
+log "Descriptor update done (output in $VLOG)"
 
 # --- End notification ---
 if [[ -n "$NOTIFY_PID" ]] && command -v st-notify &>/dev/null; then
-  st-notify -t 45000 -b "#6bcfff" -bg "#001a2e" -fg "#f1faee" \
+  st-notify -t 45000 -ts 18 -b "#6bcfff" -bg "#001a2e" -fg "#f1faee" \
     "$NOTIFY_PID" "Memory validation complete" &>/dev/null &
 fi
 

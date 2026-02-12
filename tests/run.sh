@@ -4,7 +4,7 @@
 # Usage: ./tests/run.sh [filter]
 #   filter — optional substring to match test names (e.g. "validation" or "forgetting")
 #
-# Clones the Agent directory to /tmp/Agent-test, creates a mock claude binary,
+# Clones the Agent directory to a unique temp dir, creates a mock claude binary,
 # runs all test functions, and reports pass/fail counts.
 
 set -euo pipefail
@@ -12,9 +12,9 @@ set -euo pipefail
 # ─── Constants ────────────────────────────────────────────────────────────────
 
 AGENT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
-TEST_DIR="/tmp/Agent-test"
-MOCK_BIN="/tmp/Agent-test-bin"
-MOCK_BREADCRUMB="/tmp/Agent-test-claude-invoked"
+TEST_DIR="$(mktemp -d /tmp/Agent-test.XXXXXX)"
+MOCK_BIN="${TEST_DIR}-bin"
+MOCK_BREADCRUMB="${TEST_DIR}-claude-invoked"
 FILTER="${1:-}"
 
 PASS=0
@@ -41,10 +41,10 @@ setup_suite() {
 
   # Create mock claude binary — consumes stdin, writes breadcrumb, exits 0
   mkdir -p "$MOCK_BIN"
-  cat > "$MOCK_BIN/claude" << 'MOCK'
+  cat > "$MOCK_BIN/claude" << MOCK
 #!/usr/bin/env bash
 cat > /dev/null
-echo "$@" > /tmp/Agent-test-claude-invoked
+echo "\$@" > $MOCK_BREADCRUMB
 echo "mock-claude-response"
 exit 0
 MOCK
@@ -318,10 +318,10 @@ test_validation_lock_written_before_spawn() {
   # Verify the lock is written BEFORE claude is invoked (the bug prevention).
   # We do this by checking that after the run, lock=CURRENT even if claude "fails".
   # Replace mock claude with one that exits 1.
-  cat > "$MOCK_BIN/claude" << 'FAILMOCK'
+  cat > "$MOCK_BIN/claude" << FAILMOCK
 #!/usr/bin/env bash
 cat > /dev/null
-echo "$@" > /tmp/Agent-test-claude-invoked
+echo "\$@" > $MOCK_BREADCRUMB
 exit 1
 FAILMOCK
   chmod +x "$MOCK_BIN/claude"
@@ -332,10 +332,10 @@ FAILMOCK
   assert_file_content "$TEST_DIR/runtime/last-validation-session" "375" "lock written before spawn (persists despite agent failure)"
 
   # Restore normal mock
-  cat > "$MOCK_BIN/claude" << 'MOCK'
+  cat > "$MOCK_BIN/claude" << MOCK
 #!/usr/bin/env bash
 cat > /dev/null
-echo "$@" > /tmp/Agent-test-claude-invoked
+echo "\$@" > $MOCK_BREADCRUMB
 echo "mock-claude-response"
 exit 0
 MOCK
@@ -414,10 +414,10 @@ test_forgetting_no_session_counter() {
 }
 
 test_forgetting_lock_written_before_spawn() {
-  cat > "$MOCK_BIN/claude" << 'FAILMOCK'
+  cat > "$MOCK_BIN/claude" << FAILMOCK
 #!/usr/bin/env bash
 cat > /dev/null
-echo "$@" > /tmp/Agent-test-claude-invoked
+echo "\$@" > $MOCK_BREADCRUMB
 exit 1
 FAILMOCK
   chmod +x "$MOCK_BIN/claude"
@@ -427,10 +427,10 @@ FAILMOCK
   run_hook forgetting-memories.sh
   assert_file_content "$TEST_DIR/runtime/last-forgetting-session" "600" "lock written before spawn (persists despite agent failure)"
 
-  cat > "$MOCK_BIN/claude" << 'MOCK'
+  cat > "$MOCK_BIN/claude" << MOCK
 #!/usr/bin/env bash
 cat > /dev/null
-echo "$@" > /tmp/Agent-test-claude-invoked
+echo "\$@" > $MOCK_BREADCRUMB
 echo "mock-claude-response"
 exit 0
 MOCK

@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# run-forgetting — Manually trigger a memory forgetting/cleanup session
+# Usage: run-forgetting [count]
+#   count  Number of lowest-scoring candidates to review (default: MEMORY_FORGETTING_CANDIDATES from agent.conf, 0 = all)
+set -euo pipefail
+
+AGENT_DIR="${CLAUDE_PROJECT_DIR:-/home/yeyito/Workspace/Agent}"
+if [[ -n "${1:-}" ]]; then
+  exec "${AGENT_DIR}/src/hooks/forgetting-memories.sh" --force "$1"
+else
+  exec "${AGENT_DIR}/src/hooks/forgetting-memories.sh" --force
+fi

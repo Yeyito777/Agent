@@ -48,13 +48,8 @@ RECALLED_FILE="${AGENT_DIR}/runtime/recalled-${AGENT_HOOK_ID}"
 LOG="${AGENT_DIR}/runtime/hook-${AGENT_HOOK_ID}.log"
 log() { echo "[$(date +%H:%M:%S)] $*" >> "$LOG"; }
 
+touch "$LOG" "$RECALLED_FILE"
 log "--- Hook fired ---"
-
-if [[ ! -f "$RECALLED_FILE" ]]; then
-  log "ERROR: Tracking file not found: ${RECALLED_FILE}"
-  echo "Hook error: Tracking file ${RECALLED_FILE} not found." >&2
-  exit 2
-fi
 
 # --- Check dependencies (degrade silently) ---
 if ! command -v jq &>/dev/null; then

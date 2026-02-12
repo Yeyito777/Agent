@@ -52,6 +52,6 @@ echo "Bumped appreciation of ${TARGET} by +${AMOUNT} (now ${NEW_SCORE})"
 
 # Notify terminal
 if [[ -n "${AGENT_TERMINAL_PID:-}" ]] && command -v st-notify &>/dev/null; then
-  st-notify -t 45000 -b "#ff6b9d" -bg "#1a0010" -fg "#f1faee" \
+  st-notify -t 16000 -b "#ff6b9d" -bg "#1a0010" -fg "#f1faee" \
     "$AGENT_TERMINAL_PID" "Kept ${TARGET} (+${AMOUNT})" &>/dev/null || true
 fi
