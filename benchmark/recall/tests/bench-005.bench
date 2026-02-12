@@ -1,0 +1,11 @@
+# Recall Benchmark Test
+# Generated: 2026-02-12T10:27:01-05:00
+# Picked: 5
+# Expected: 2
+
+[expected]
+memory/disk-audit-cleanup-guide.md
+memory/swap-file-configuration.md
+
+[prompt]
+I'm running low on disk space and my builds keep getting OOM killed. Can you remind me what cleanup options I have and also check if my swap is set up right?

@@ -1,0 +1,11 @@
+# Recall Benchmark Test
+# Generated: 2026-02-12T10:26:47-05:00
+# Picked: 5
+# Expected: 2
+
+[expected]
+memory/user-git-config-location.md
+memory/qutebrowser.md
+
+[prompt]
+I want to add a new git alias called `lg` for a pretty log format. Where's my git config again? Also, can you remind me how to commit changes across all the submodule levels in my qutebrowser project?

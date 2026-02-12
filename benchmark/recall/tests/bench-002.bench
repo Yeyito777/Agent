@@ -1,0 +1,10 @@
+# Recall Benchmark Test
+# Generated: 2026-02-12T10:26:40-05:00
+# Picked: 1
+# Expected: 1
+
+[expected]
+memory/manual-testing-agent-hooks.md
+
+[prompt]
+I'm trying to manually test my forgetting-memories hook but it keeps failing silently. I'm running it with `echo '{"test": true}' | bash src/hooks/forgetting-memories.sh` and setting CLAUDE_PROJECT_DIR to my test clone. Any idea what I'm doing wrong?

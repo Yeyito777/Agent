@@ -1,0 +1,10 @@
+# Recall Benchmark Test
+# Generated: 2026-02-12T10:27:16-05:00
+# Picked: 1
+# Expected: 1
+
+[expected]
+memory/automatic-memory-recall-system.md
+
+[prompt]
+I want to change the forgetting schedule so it runs every 100 sessions instead of 200. Also, can you remind me how the scoring formula works for deciding which memories to archive?

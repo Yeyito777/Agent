@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # autogenerate.sh — Generate recall benchmark test cases
-# Picks random memories, asks an agent to craft a user prompt
-# related to them, and saves the result as a .bench file.
+# Picks random memories, asks opus to craft a related user prompt,
+# and validates which memories are genuinely relevant.
 
 set -euo pipefail
 
@@ -13,42 +13,21 @@ MEMORY_DIR="${AGENT_DIR}/memory"
 # --- Defaults ---
 SAMPLES=1
 AMOUNT=""
-STRENGTH=""
-STRENGTH_VALUE=""
 NAME=""
 
 # --- Parse arguments ---
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --samples)         SAMPLES="$2";        shift 2 ;;
-    --amount)          AMOUNT="$2";         shift 2 ;;
-    --strength)        STRENGTH="$2";       shift 2 ;;
-    --strength-value)  STRENGTH_VALUE="$2"; shift 2 ;;
-    --name)            NAME="$2";           shift 2 ;;
+    --samples)  SAMPLES="$2";  shift 2 ;;
+    --amount)   AMOUNT="$2";   shift 2 ;;
+    --name)     NAME="$2";     shift 2 ;;
     *)
       echo "Unknown option: $1" >&2
-      echo "Usage: $0 [--samples N] [--amount N] [--strength STR [--strength-value INT]] [--name STR]" >&2
+      echo "Usage: $0 [--samples N] [--amount N] [--name STR]" >&2
       exit 1
       ;;
   esac
 done
-
-# --- Built-in strength values ---
-declare -A BUILTIN_STRENGTHS=( ["strongly"]=3 ["moderately"]=2 ["loosely"]=1 )
-
-# --- Validate custom strength requires --strength-value ---
-if [[ -n "$STRENGTH" && -z "${BUILTIN_STRENGTHS[$STRENGTH]+x}" && -z "$STRENGTH_VALUE" ]]; then
-  echo "Error: custom strength '${STRENGTH}' requires --strength-value <int>" >&2
-  exit 1
-fi
-if [[ -n "$STRENGTH_VALUE" && -z "$STRENGTH" ]]; then
-  echo "Error: --strength-value requires --strength" >&2
-  exit 1
-fi
-if [[ -n "$STRENGTH_VALUE" ]] && ! [[ "$STRENGTH_VALUE" =~ ^[0-9]+$ ]]; then
-  echo "Error: --strength-value must be an integer" >&2
-  exit 1
-fi
 
 # --- Validate ---
 if ! command -v claude &>/dev/null; then
@@ -78,20 +57,6 @@ for (( i=1; i<=SAMPLES; i++ )); do
   # Clamp to available memories
   if (( COUNT > TOTAL_MEMORIES )); then
     COUNT=$TOTAL_MEMORIES
-  fi
-
-  # Determine strength for this sample
-  if [[ -n "$STRENGTH" ]]; then
-    SAMPLE_STRENGTH="$STRENGTH"
-    if [[ -n "$STRENGTH_VALUE" ]]; then
-      SAMPLE_STRENGTH_INT="$STRENGTH_VALUE"
-    else
-      SAMPLE_STRENGTH_INT="${BUILTIN_STRENGTHS[$STRENGTH]}"
-    fi
-  else
-    STRENGTHS=("strongly" "moderately" "loosely")
-    SAMPLE_STRENGTH="${STRENGTHS[$(( RANDOM % 3 ))]}"
-    SAMPLE_STRENGTH_INT="${BUILTIN_STRENGTHS[$SAMPLE_STRENGTH]}"
   fi
 
   # Pick random memories
@@ -127,22 +92,31 @@ ${CONTENT}
 "
   done
 
-  # Ask agent to generate a user prompt
-  QUERY="You are generating test data for a memory recall benchmark. You have been given ${COUNT} memories from the user's memory system. Your task is to write a realistic user prompt that is ${SAMPLE_STRENGTH} related to these memories.
+  # Ask opus to generate a user prompt with self-validation
+  QUERY="You are generating test data for a memory recall benchmark. You will receive ${COUNT} memories from a user's personal memory system. Each memory stores info about the user's tools, configurations, projects, or preferences.
 
-Guidelines:
-- The prompt should sound like something a real user would type into a coding assistant
-- \"strongly\" related means the prompt directly asks about or references the topics in the memories
-- \"moderately\" related means the prompt is about a related topic where the memories would be useful context
-- \"loosely\" related means the prompt is tangentially connected — the memories might be helpful but aren't obvious matches
-- Output ONLY the user prompt text, nothing else — no quotes, no explanation, no preamble
+Write a realistic user prompt (1-3 sentences) that someone would type into a coding assistant, where the given memories would be genuinely useful context for answering.
+
+Rules:
+- Sound natural — like a real person typing into a CLI assistant
+- Don't mention memory filenames or the memory system
+- Don't force connections that aren't there
+
+After writing the prompt, list ONLY the memories that are genuinely relevant to it. If some memories can't be naturally connected to a single prompt, exclude them — accuracy matters more than including everything.
+
+Output format (follow EXACTLY, no extra text):
+[prompt]
+<the user prompt>
+
+[relevant]
+<one memory filename per line, only those truly relevant>
 ${MEMORY_BLOCK}"
 
-  echo "[${i}/${SAMPLES}] Generating ${SAMPLE_STRENGTH} prompt from ${COUNT} memories..."
+  echo "[${i}/${SAMPLES}] Generating prompt from ${COUNT} memories..."
 
   STDERR_LOG=$(mktemp)
   GENERATED=$(echo "$QUERY" | (cd /tmp && AGENT_HOOK_ID="" BLOCK_HOOK_AGENTS=1 claude -p \
-    --model sonnet \
+    --model opus \
     --max-turns 1 \
     --tools "" \
     --no-session-persistence \
@@ -157,6 +131,66 @@ ${MEMORY_BLOCK}"
 
   if [[ -z "$GENERATED" || "$GENERATED" =~ ^[[:space:]]*$ ]]; then
     echo "Warning: empty response from agent, skipping sample ${i}" >&2
+    continue
+  fi
+
+  # --- Parse opus response: extract [prompt] and [relevant] sections ---
+  SECTION=""
+  PROMPT_TEXT=""
+  RELEVANT=()
+
+  while IFS= read -r line; do
+    if [[ "$line" == "[prompt]" ]]; then
+      SECTION="prompt"
+      continue
+    elif [[ "$line" == "[relevant]" ]]; then
+      SECTION="relevant"
+      continue
+    fi
+
+    case "$SECTION" in
+      prompt)
+        line_trimmed=$(echo "$line" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+        if [[ -n "$line_trimmed" ]]; then
+          if [[ -n "$PROMPT_TEXT" ]]; then
+            PROMPT_TEXT="${PROMPT_TEXT}
+${line_trimmed}"
+          else
+            PROMPT_TEXT="$line_trimmed"
+          fi
+        fi
+        ;;
+      relevant)
+        line_trimmed=$(echo "$line" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+        [[ -n "$line_trimmed" ]] && RELEVANT+=("$line_trimmed")
+        ;;
+    esac
+  done <<< "$GENERATED"
+
+  if [[ -z "$PROMPT_TEXT" ]]; then
+    echo "Warning: could not parse prompt from response, skipping sample ${i}" >&2
+    echo "  Response was: ${GENERATED:0:200}" >&2
+    continue
+  fi
+
+  if [[ ${#RELEVANT[@]} -eq 0 ]]; then
+    echo "Warning: no relevant memories in response, skipping sample ${i}" >&2
+    continue
+  fi
+
+  # Validate relevant memories exist in the picked set
+  VALIDATED=()
+  for rel in "${RELEVANT[@]}"; do
+    for name in "${MEMORY_NAMES[@]}"; do
+      if [[ "$rel" == "$name" ]]; then
+        VALIDATED+=("$rel")
+        break
+      fi
+    done
+  done
+
+  if [[ ${#VALIDATED[@]} -eq 0 ]]; then
+    echo "Warning: none of the relevant memories matched picked set, skipping sample ${i}" >&2
     continue
   fi
 
@@ -176,22 +210,19 @@ ${MEMORY_BLOCK}"
   {
     echo "# Recall Benchmark Test"
     echo "# Generated: $(date -Iseconds)"
-    echo "# Strength: ${SAMPLE_STRENGTH}"
-    echo "# Memory count: ${COUNT}"
+    echo "# Picked: ${COUNT}"
+    echo "# Expected: ${#VALIDATED[@]}"
     echo ""
     echo "[expected]"
-    for name in "${MEMORY_NAMES[@]}"; do
+    for name in "${VALIDATED[@]}"; do
       echo "$name"
     done
     echo ""
-    echo "[prompt-data]"
-    echo "strength=${SAMPLE_STRENGTH_INT}"
-    echo ""
     echo "[prompt]"
-    echo "$GENERATED"
+    echo "$PROMPT_TEXT"
   } > "$BENCH_FILE"
 
-  echo "  -> ${BENCH_FILE}"
+  echo "  -> ${BENCH_FILE} (${#VALIDATED[@]}/${COUNT} memories validated)"
 done
 
 echo "Done. Generated ${SAMPLES} benchmark file(s) in ${TESTS_DIR}/"

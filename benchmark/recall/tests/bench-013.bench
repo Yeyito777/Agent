@@ -1,0 +1,11 @@
+# Recall Benchmark Test
+# Generated: 2026-02-12T10:28:03-05:00
+# Picked: 2
+# Expected: 2
+
+[expected]
+memory/modifying-agent-src.md
+memory/supcord-project.md
+
+[prompt]
+I'm adding a new hook script to my agent setup that should trigger when I open a Supcord workspace session. Where do I need to register it and what files should I update to keep everything in sync?

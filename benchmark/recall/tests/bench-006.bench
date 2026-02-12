@@ -1,0 +1,12 @@
+# Recall Benchmark Test
+# Generated: 2026-02-12T10:27:09-05:00
+# Picked: 4
+# Expected: 3
+
+[expected]
+memory/regression-tests-agent.md
+memory/manual-testing-agent-hooks.md
+memory/recall-benchmark.md
+
+[prompt]
+I want to add a new hook that runs every 150 sessions. Before I start coding, can you walk me through how I should test it? I want to make sure I cover both automated and manual testing, and also add a benchmark case to verify recall works with the new hook's memories.

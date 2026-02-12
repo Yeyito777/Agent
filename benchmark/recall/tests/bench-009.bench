@@ -1,0 +1,11 @@
+# Recall Benchmark Test
+# Generated: 2026-02-12T10:27:31-05:00
+# Picked: 2
+# Expected: 2
+
+[expected]
+memory/suckless-st.md
+memory/claude-code-binary-inspection.md
+
+[prompt]
+I'm working on my st terminal fork and I have a long-running `make test` that sometimes gets killed before finishing. Is there a way to increase the bash command timeout so it doesn't get cut off?

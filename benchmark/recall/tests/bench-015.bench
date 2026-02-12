@@ -1,0 +1,11 @@
+# Recall Benchmark Test
+# Generated: 2026-02-12T10:28:19-05:00
+# Picked: 4
+# Expected: 2
+
+[expected]
+memory/suckless-st.md
+memory/suckless-dwm.md
+
+[prompt]
+I want to add a feature to st where it saves and restores the current git branch name across dwm restarts. The idea is that st would read the git branch from the cwd and persist it alongside the scrollback and cwd data. Where should I hook into the existing persist code, and do I need to update dwm's persist mode too?

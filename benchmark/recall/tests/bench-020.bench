@@ -1,0 +1,10 @@
+# Recall Benchmark Test
+# Generated: 2026-02-12T10:29:01-05:00
+# Picked: 1
+# Expected: 1
+
+[expected]
+memory/qutebrowser.md
+
+[prompt]
+I'm trying to add a new web setting to my qutebrowser fork that controls whether autoplay is allowed. I know there are a bunch of files I need to touch across the chromium and Qt layers. Can you walk me through the process? The source is in ~/Workspace/Qutebrowser/

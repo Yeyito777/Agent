@@ -1,0 +1,10 @@
+# Recall Benchmark Test
+# Generated: 2026-02-12T10:27:24-05:00
+# Picked: 5
+# Expected: 1
+
+[expected]
+memory/user-git-config-location.md
+
+[prompt]
+I want to add a new git alias called `lg` for a pretty log format. Also, can you remind me where my git config actually lives? I always forget since I moved it from the default location.

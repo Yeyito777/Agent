@@ -1,0 +1,12 @@
+# Recall Benchmark Test
+# Generated: 2026-02-12T10:27:39-05:00
+# Picked: 3
+# Expected: 3
+
+[expected]
+memory/dmenu-usage-and-scripting.md
+memory/suckless-st.md
+memory/suckless-dwm.md
+
+[prompt]
+I want to add a new dmenu script that lets me pick from my open terminal windows and jump to them. It should show the CWD of each st terminal. Where does st expose the working directory, and how do I wire up the keybinding in dwm?

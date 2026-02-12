@@ -1,0 +1,10 @@
+# Recall Benchmark Test
+# Generated: 2026-02-12T10:28:34-05:00
+# Picked: 1
+# Expected: 1
+
+[expected]
+memory/about-user-todo-organization.md
+
+[prompt]
+Hey, can you add "finish API refactor" to my todo?

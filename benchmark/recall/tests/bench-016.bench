@@ -1,0 +1,11 @@
+# Recall Benchmark Test
+# Generated: 2026-02-12T10:28:26-05:00
+# Picked: 2
+# Expected: 2
+
+[expected]
+memory/suckless-dmenu.md
+memory/automatic-memory-recall-system.md
+
+[prompt]
+I want to change the forgetting schedule to run every 100 sessions instead of 200. Also, can you remind me how to rebuild dmenu after I tweak the border width in config.h?

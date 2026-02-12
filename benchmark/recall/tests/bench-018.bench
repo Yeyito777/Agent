@@ -1,0 +1,12 @@
+# Recall Benchmark Test
+# Generated: 2026-02-12T10:28:43-05:00
+# Picked: 5
+# Expected: 3
+
+[expected]
+memory/suckless-st.md
+memory/st-notify-system.md
+memory/user-keyboard-configuration.md
+
+[prompt]
+I want to add a new notification style to st that flashes red when an SSH session disconnects. Before I start coding, can you remind me how the notification system works and how to send a styled notification from a shell script? Also, I need to make sure my Right Shift autosuggestion binding still works after I rebuild.

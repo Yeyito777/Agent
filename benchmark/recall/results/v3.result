@@ -1,0 +1,239 @@
+# Recall Benchmark Results
+# Date: 2026-02-12T10:31:35-05:00
+# Tests: 20
+
+[summary]
+total_tests=20
+perfect=9 (45%)
+overrecall=11 (55%)
+underrecall=0 (0%)
+total_memories_overrecalled=21
+total_memories_underrecalled=0
+total_misrecalled=21
+
+[tests]
+
+--- bench-001.bench ---
+Expected (2):
+  memory/manual-testing-agent-hooks.md
+  memory/automatic-memory-recall-system.md
+Recalled (4):
+  memory/automatic-memory-recall-system.md
+  memory/manual-testing-agent-hooks.md
+  memory/regression-tests-agent.md
+  memory/modifying-agent-src.md
+Result: OVERRECALL
+Extra (2):
+  memory/regression-tests-agent.md
+  memory/modifying-agent-src.md
+
+--- bench-002.bench ---
+Expected (1):
+  memory/manual-testing-agent-hooks.md
+Recalled (4):
+  memory/manual-testing-agent-hooks.md
+  memory/automatic-memory-recall-system.md
+  memory/regression-tests-agent.md
+  memory/modifying-agent-src.md
+Result: OVERRECALL
+Extra (3):
+  memory/automatic-memory-recall-system.md
+  memory/regression-tests-agent.md
+  memory/modifying-agent-src.md
+
+--- bench-003.bench ---
+Expected (2):
+  memory/user-git-config-location.md
+  memory/qutebrowser.md
+Recalled (2):
+  memory/user-git-config-location.md
+  memory/qutebrowser.md
+Result: PERFECT
+
+--- bench-004.bench ---
+Expected (1):
+  memory/user-git-config-location.md
+Recalled (1):
+  memory/user-git-config-location.md
+Result: PERFECT
+
+--- bench-005.bench ---
+Expected (2):
+  memory/disk-audit-cleanup-guide.md
+  memory/swap-file-configuration.md
+Recalled (2):
+  memory/disk-audit-cleanup-guide.md
+  memory/swap-file-configuration.md
+Result: PERFECT
+
+--- bench-006.bench ---
+Expected (3):
+  memory/regression-tests-agent.md
+  memory/manual-testing-agent-hooks.md
+  memory/recall-benchmark.md
+Recalled (5):
+  memory/automatic-memory-recall-system.md
+  memory/manual-testing-agent-hooks.md
+  memory/recall-benchmark.md
+  memory/regression-tests-agent.md
+  memory/modifying-agent-src.md
+Result: OVERRECALL
+Extra (2):
+  memory/automatic-memory-recall-system.md
+  memory/modifying-agent-src.md
+
+--- bench-007.bench ---
+Expected (1):
+  memory/automatic-memory-recall-system.md
+Recalled (4):
+  memory/automatic-memory-recall-system.md
+  memory/manual-testing-agent-hooks.md
+  memory/regression-tests-agent.md
+  memory/modifying-agent-src.md
+Result: OVERRECALL
+Extra (3):
+  memory/manual-testing-agent-hooks.md
+  memory/regression-tests-agent.md
+  memory/modifying-agent-src.md
+
+--- bench-008.bench ---
+Expected (1):
+  memory/user-git-config-location.md
+Recalled (1):
+  memory/user-git-config-location.md
+Result: PERFECT
+
+--- bench-009.bench ---
+Expected (2):
+  memory/suckless-st.md
+  memory/claude-code-binary-inspection.md
+Recalled (2):
+  memory/suckless-st.md
+  memory/claude-code-binary-inspection.md
+Result: PERFECT
+
+--- bench-010.bench ---
+Expected (3):
+  memory/dmenu-usage-and-scripting.md
+  memory/suckless-st.md
+  memory/suckless-dwm.md
+Recalled (4):
+  memory/dmenu-usage-and-scripting.md
+  memory/suckless-dmenu.md
+  memory/suckless-dwm.md
+  memory/suckless-st.md
+Result: OVERRECALL
+Extra (1):
+  memory/suckless-dmenu.md
+
+--- bench-011.bench ---
+Expected (1):
+  memory/claude-code-binary-inspection.md
+Recalled (1):
+  memory/claude-code-binary-inspection.md
+Result: PERFECT
+
+--- bench-012.bench ---
+Expected (2):
+  memory/user-terminal-color-scheme.md
+  memory/user-keyboard-configuration.md
+Recalled (3):
+  memory/suckless-st.md
+  memory/user-terminal-color-scheme.md
+  memory/user-keyboard-configuration.md
+Result: OVERRECALL
+Extra (1):
+  memory/suckless-st.md
+
+--- bench-013.bench ---
+Expected (2):
+  memory/modifying-agent-src.md
+  memory/supcord-project.md
+Recalled (5):
+  memory/modifying-agent-src.md
+  memory/automatic-memory-recall-system.md
+  memory/manual-testing-agent-hooks.md
+  memory/regression-tests-agent.md
+  memory/supcord-project.md
+Result: OVERRECALL
+Extra (3):
+  memory/automatic-memory-recall-system.md
+  memory/manual-testing-agent-hooks.md
+  memory/regression-tests-agent.md
+
+--- bench-014.bench ---
+Expected (1):
+  memory/recall-benchmark.md
+Recalled (1):
+  memory/recall-benchmark.md
+Result: PERFECT
+
+--- bench-015.bench ---
+Expected (2):
+  memory/suckless-st.md
+  memory/suckless-dwm.md
+Recalled (2):
+  memory/suckless-st.md
+  memory/suckless-dwm.md
+Result: PERFECT
+
+--- bench-016.bench ---
+Expected (2):
+  memory/suckless-dmenu.md
+  memory/automatic-memory-recall-system.md
+Recalled (5):
+  memory/automatic-memory-recall-system.md
+  memory/suckless-dmenu.md
+  memory/manual-testing-agent-hooks.md
+  memory/modifying-agent-src.md
+  memory/regression-tests-agent.md
+Result: OVERRECALL
+Extra (3):
+  memory/manual-testing-agent-hooks.md
+  memory/modifying-agent-src.md
+  memory/regression-tests-agent.md
+
+--- bench-017.bench ---
+Expected (1):
+  memory/about-user-todo-organization.md
+Recalled (1):
+  memory/about-user-todo-organization.md
+Result: PERFECT
+
+--- bench-018.bench ---
+Expected (3):
+  memory/suckless-st.md
+  memory/st-notify-system.md
+  memory/user-keyboard-configuration.md
+Recalled (4):
+  memory/st-notify-system.md
+  memory/suckless-st.md
+  memory/user-keyboard-configuration.md
+  memory/user-terminal-color-scheme.md
+Result: OVERRECALL
+Extra (1):
+  memory/user-terminal-color-scheme.md
+
+--- bench-019.bench ---
+Expected (3):
+  memory/swap-file-configuration.md
+  memory/disk-audit-cleanup-guide.md
+  memory/supcord-project.md
+Recalled (4):
+  memory/swap-file-configuration.md
+  memory/disk-audit-cleanup-guide.md
+  memory/qutebrowser.md
+  memory/supcord-project.md
+Result: OVERRECALL
+Extra (1):
+  memory/qutebrowser.md
+
+--- bench-020.bench ---
+Expected (1):
+  memory/qutebrowser.md
+Recalled (2):
+  memory/qutebrowser.md
+  memory/qutebrowser-runtime.md
+Result: OVERRECALL
+Extra (1):
+  memory/qutebrowser-runtime.md

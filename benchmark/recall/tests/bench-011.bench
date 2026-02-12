@@ -1,0 +1,10 @@
+# Recall Benchmark Test
+# Generated: 2026-02-12T10:27:46-05:00
+# Picked: 1
+# Expected: 1
+
+[expected]
+memory/claude-code-binary-inspection.md
+
+[prompt]
+My Claude Code keeps timing out on long-running bash commands. Is there a way to increase the timeout limit? I've heard there might be env vars for this but I'm not sure what the defaults are or if there's a maximum cap.

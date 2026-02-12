@@ -1,0 +1,11 @@
+# Recall Benchmark Test
+# Generated: 2026-02-12T10:26:32-05:00
+# Picked: 5
+# Expected: 2
+
+[expected]
+memory/manual-testing-agent-hooks.md
+memory/automatic-memory-recall-system.md
+
+[prompt]
+I'm trying to debug why my forgetting hook isn't triggering at the right session interval. I set session-counter to 400 and last-forgetting-session to 0, but it seems like the values are getting corrupted. Can you walk me through how to manually test this in an isolated environment?

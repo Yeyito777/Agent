@@ -1,0 +1,10 @@
+# Recall Benchmark Test
+# Generated: 2026-02-12T10:28:10-05:00
+# Picked: 1
+# Expected: 1
+
+[expected]
+memory/recall-benchmark.md
+
+[prompt]
+I want to add a new strength level called "tangential" to the autogenerate script. What's the current mapping for the built-in strength values, and where would I need to make changes?

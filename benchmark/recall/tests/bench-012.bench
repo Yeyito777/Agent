@@ -1,0 +1,11 @@
+# Recall Benchmark Test
+# Generated: 2026-02-12T10:27:54-05:00
+# Picked: 4
+# Expected: 2
+
+[expected]
+memory/user-terminal-color-scheme.md
+memory/user-keyboard-configuration.md
+
+[prompt]
+I'm working on my st terminal config and want to add a new keybinding that toggles between my current ocean theme and a high-contrast mode. Where are my color definitions and how does st handle key events — specifically, can I hook into something similar to how right shift is already handled?

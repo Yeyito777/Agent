@@ -1,0 +1,12 @@
+# Recall Benchmark Test
+# Generated: 2026-02-12T10:28:53-05:00
+# Picked: 4
+# Expected: 3
+
+[expected]
+memory/swap-file-configuration.md
+memory/disk-audit-cleanup-guide.md
+memory/supcord-project.md
+
+[prompt]
+I'm about to do a big Chromium build for my qutebrowser project and I'm worried about running out of memory. Can you remind me how my swap is set up and also check if there's anything I can clean up to free disk space before the build? Also, will the Supcord cargo build artifacts add to the problem?
