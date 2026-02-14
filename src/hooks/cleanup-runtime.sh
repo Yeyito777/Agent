@@ -4,7 +4,8 @@
 
 if [[ -n "${AGENT_HOOK_ID:-}" ]]; then
   rm -f "${CLAUDE_PROJECT_DIR}/runtime/recalled-${AGENT_HOOK_ID}" \
-        "${CLAUDE_PROJECT_DIR}/runtime/hook-${AGENT_HOOK_ID}.log"
+        "${CLAUDE_PROJECT_DIR}/runtime/hook-${AGENT_HOOK_ID}.log" \
+        "${CLAUDE_PROJECT_DIR}/runtime/agent-${AGENT_HOOK_ID}.pid"
 fi
 
 exit 0

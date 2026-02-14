@@ -41,7 +41,23 @@ find_terminal_pid() {
   done
 }
 export AGENT_TERMINAL_PID=$(find_terminal_pid)
+export AGENT_START_PID=$$
 mkdir -p runtime memory-metadata memory-cold
+
+# Prune runtime files from orphaned sessions (terminal killed, dwm restart, reboot)
+# Pass 1: pid files with dead processes
+for pidfile in runtime/agent-*.pid; do
+  [[ -f "$pidfile" ]] || continue
+  id=$(basename "$pidfile" .pid | sed 's/agent-//')
+  kill -0 "$(cat "$pidfile")" 2>/dev/null && continue
+  rm -f "runtime/recalled-$id" "runtime/hook-$id.log" "$pidfile"
+done
+# Pass 2: hook/recalled files with no pid file (pre-mechanism leftovers)
+for f in runtime/hook-*.log runtime/recalled-*; do
+  [[ -f "$f" ]] || continue
+  id=$(basename "$f" | sed 's/^hook-//; s/^recalled-//; s/\.log$//')
+  [[ -f "runtime/agent-${id}.pid" ]] || rm -f "runtime/hook-$id.log" "runtime/recalled-$id"
+done
 
 # Reconcile memory metadata (uses current counter value, does not increment)
 python3 src/reconcile_metadata.py
@@ -55,6 +71,7 @@ if [[ -n "$AGENT_TERMINAL_PID" ]] && command -v st-notify &>/dev/null; then
 fi
 
 touch "runtime/recalled-${AGENT_HOOK_ID}" "runtime/hook-${AGENT_HOOK_ID}.log"
+echo "$AGENT_START_PID" > "runtime/agent-${AGENT_HOOK_ID}.pid"
 
 # Parse --resume flag (forwarded to claude)
 CLAUDE_ARGS=(--dangerously-skip-permissions)
