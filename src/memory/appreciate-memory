@@ -27,26 +27,22 @@ if [[ ! "$AMOUNT" =~ ^[0-9]+$ ]] || [[ "$AMOUNT" -eq 0 ]]; then
 fi
 
 MEM_FILE="${AGENT_DIR}/${TARGET}"
-MEM_NAME=$(basename "$TARGET" .md)
-META_FILE="${AGENT_DIR}/memory-metadata/${MEM_NAME}.json"
 
 if [[ ! -f "$MEM_FILE" ]]; then
   echo "Error: $TARGET does not exist" >&2
   exit 1
 fi
 
-if [[ ! -f "$META_FILE" ]]; then
-  echo "Error: metadata file memory-metadata/${MEM_NAME}.json does not exist" >&2
-  exit 1
-fi
-
 NEW_SCORE=$(python3 -c "
-import json
-f = '${META_FILE}'
-with open(f) as fh: d = json.load(fh)
-d['appreciation'] = d.get('appreciation', 0) + ${AMOUNT}
-with open(f, 'w') as fh: json.dump(d, fh, indent=2); fh.write('\n')
-print(d['appreciation'])
+import sys
+sys.path.insert(0, '${AGENT_DIR}/src')
+from memory_metadata import read_metadata, write_metadata
+from pathlib import Path
+f = Path('${MEM_FILE}')
+meta = read_metadata(f)
+meta['appreciation'] = meta.get('appreciation', 0) + ${AMOUNT}
+write_metadata(f, meta)
+print(meta['appreciation'])
 ")
 echo "Bumped appreciation of ${TARGET} by +${AMOUNT} (now ${NEW_SCORE})"
 

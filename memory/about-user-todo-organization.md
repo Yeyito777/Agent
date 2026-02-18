@@ -1,3 +1,14 @@
+<memory-metadata>
+{
+  "frequency": 28,
+  "last_accessed_session": 522,
+  "created_session": 0,
+  "appreciation": 0,
+  "pinned": true
+}
+</memory-metadata>
+
+<memory>
 Todo file locations, task list organization, todo terminology — personal todo at ~/Desktop/todo.md ("my todo", "my tasks", "check my todo", "add to my todo"), project-specific TODO.md in project root, Agent TODO.md at /home/yeyito/Workspace/Agent/TODO.md — disambiguating "my todo" vs "project todo" vs "Agent todo", where to find or edit todos, task management file paths
 
 # Structure
@@ -20,3 +31,4 @@ Agent (this project) has its own `TODO.md` at `/home/yeyito/Workspace/Agent/TODO
 
 ---
 Update this memory when the information above becomes outdated.
+</memory>

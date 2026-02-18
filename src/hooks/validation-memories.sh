@@ -136,7 +136,7 @@ And tell the subagent this:
 Read this memory file <memory> and verify that the information is still accurate. Update anything you
 can confirm is outdated.
 
-1. Read the full memory file
+1. Read the full memory file. Content lives inside <memory> tags. Do NOT modify <memory-metadata> tags at the top — those are managed by the pipeline.
 2. For every factual claim in the memory, verify it against the actual source of truth:
   - File paths mentioned → check they exist with ls or Read
   - File contents described (config values, code snippets, function signatures) → read the actual
@@ -157,8 +157,9 @@ deleting the reference
 Rules:
 - Be thorough — read every referenced file, run every checkable command
 - Do NOT make cosmetic changes, reformat, or reorganize — only fix factual inaccuracies
-- Do NOT change the first line (description) unless it is factually wrong
+- Do NOT change the first line inside <memory> (description) unless it is factually wrong
 - Do NOT change the footer
+- Do NOT modify <memory-metadata> tags
 - If the entire memory is accurate, move on without editing it
 - Log which memories you checked and what (if anything) you changed, as a summary at the end
 \`\`\`
@@ -188,12 +189,13 @@ Go through every file in here:
 ${FILE_LIST}
 \`\`\`
 
-And update the first line of each to maximize retrieval by the recall agent.
+And update the first line inside the <memory> tag of each to maximize retrieval by the recall agent.
 
 Context: The recall system generates pointers by reading ONLY the first line of each memory file. These pointers are shown to an opus subclaude that decides which memories are relevant to the user's prompt. The first line is the ONLY signal it has — it never sees the rest of the file.
 
 Rules:
-- The first line must be a single line (no line breaks) of plaintext — no markdown, no # headers
+- The first line inside <memory> must be a single line (no line breaks) of plaintext — no markdown, no # headers
+- Do NOT modify <memory-metadata> tags at the top of the file
 - Front-load key nouns, tools, technologies, and concepts
 - Include synonyms and alternate phrasings a user might use when asking about this topic
 - Be specific, not generic (e.g. "dwm window manager — tiling, tags, keybindings, config.h,
@@ -201,7 +203,7 @@ patching suckless" not "Window manager notes")
 - Mention the tool/system name AND what it does AND key subtopics
 - Read the full content of each memory before writing its description — the description should
 cover all major topics in the file
-- Do NOT change anything else in the file — only the first line
+- Do NOT change anything else in the file — only the first line inside <memory>
 
 Process:
 1. Read each memory file

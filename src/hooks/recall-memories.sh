@@ -80,6 +80,7 @@ rm -f "$RECALL_STDERR"
 log "recall.sh returned: ${RESULT:-<empty>}"
 
 # --- Deduplicate and update metadata ---
+METADATA_PY="${AGENT_DIR}/src/memory_metadata.py"
 NEW_MEMORIES=()
 while IFS= read -r line; do
   [[ -z "$line" ]] && continue
@@ -94,17 +95,19 @@ while IFS= read -r line; do
   NEW_MEMORIES+=("$line")
   log "RECALLED: $line"
 
-  # Update metadata (frequency + last_accessed_session)
-  MEM_NAME=$(basename "$line" .md)
-  META_FILE="${AGENT_DIR}/memory-metadata/${MEM_NAME}.json"
-  if [[ -f "$META_FILE" ]]; then
+  # Update in-file metadata (frequency + last_accessed_session)
+  MEM_FILE="${AGENT_DIR}/${line}"
+  if [[ -f "$MEM_FILE" ]]; then
     python3 -c "
-import json
-f = '${META_FILE}'
-with open(f) as fh: d = json.load(fh)
-d['frequency'] = d.get('frequency', 0) + 1
-d['last_accessed_session'] = ${AGENT_SESSION:-0}
-with open(f, 'w') as fh: json.dump(d, fh, indent=2); fh.write('\n')
+import sys
+sys.path.insert(0, '${AGENT_DIR}/src')
+from memory_metadata import read_metadata, write_metadata
+from pathlib import Path
+f = Path('${MEM_FILE}')
+meta = read_metadata(f)
+meta['frequency'] = meta.get('frequency', 0) + 1
+meta['last_accessed_session'] = ${AGENT_SESSION:-0}
+write_metadata(f, meta)
 " 2>/dev/null || log "WARN: failed to update metadata for $line"
   fi
 done <<< "$RESULT"
@@ -114,7 +117,13 @@ if [[ ${#NEW_MEMORIES[@]} -gt 0 ]]; then
   log "OUTPUT: Relevant memories: ${NEW_MEMORIES[*]}"
   OUTPUT="Relevant memories:"
   for mem in "${NEW_MEMORIES[@]}"; do
-    desc=$(head -1 "${AGENT_DIR}/${mem}" | sed 's/^[[:space:]]*//')
+    desc=$(python3 -c "
+import sys
+sys.path.insert(0, '${AGENT_DIR}/src')
+from memory_metadata import get_description
+from pathlib import Path
+print(get_description(Path('${AGENT_DIR}/${mem}')))
+" 2>/dev/null || head -1 "${AGENT_DIR}/${mem}" | sed 's/^[[:space:]]*//')
     OUTPUT="${OUTPUT}
 - ${mem} — ${desc}"
   done

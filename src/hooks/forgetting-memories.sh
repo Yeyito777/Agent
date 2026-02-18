@@ -110,14 +110,16 @@ FORGETTING_MIN_AGE="${FORGETTING_MIN_AGE:-50}"
 
 log "Scoring memories..."
 CANDIDATES=$(python3 -c "
-import json, math
+import sys, math
+sys.path.insert(0, '${AGENT_DIR}/src')
 from pathlib import Path
+from memory_metadata import read_metadata
 
-metadata_dir = Path('${AGENT_DIR}/memory-metadata')
+memory_dir = Path('${AGENT_DIR}/memory')
 current_session = ${CURRENT_SESSION}
 scores = []
-for f in sorted(metadata_dir.glob('*.json')):
-    d = json.loads(f.read_text())
+for f in sorted(memory_dir.glob('*.md')):
+    d = read_metadata(f)
     if d.get('pinned', False):
         continue
     age = current_session - d.get('created_session', 0)
@@ -151,8 +153,7 @@ read -r -d '' USER_PROMPT << PROMPT || true
 You are the memory forgetting agent. Review the candidates below and decide whether to archive or keep each one.
 
 ## Environment
-- Memory files: ${AGENT_DIR}/memory/*.md
-- Metadata files: ${AGENT_DIR}/memory-metadata/*.json
+- Memory files: ${AGENT_DIR}/memory/*.md (metadata is embedded in <memory-metadata> tags at the top of each file)
 - Cold storage: ${AGENT_DIR}/memory-cold/
 
 ## Candidates for forgetting (lowest scoring memories)

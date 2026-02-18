@@ -1,3 +1,14 @@
+<memory-metadata>
+{
+  "frequency": 1,
+  "last_accessed_session": 440,
+  "created_session": 428,
+  "appreciation": 0,
+  "pinned": false
+}
+</memory-metadata>
+
+<memory>
 DNSimple API v2 usage — authentication, account token, user token, DNS records, domains, yeyito.dev, dynamic DNS, Accept header required, rate limiting, env vars, zone activation, curl pitfalls
 
 ## Authentication
@@ -96,3 +107,4 @@ Key scripts:
 
 ## Updating this memory
 If new endpoints are used, add them. If rate limit behavior becomes clearer, update that section. If tokens are rotated, note the new env var names. If new domains are added, add their info.
+</memory>

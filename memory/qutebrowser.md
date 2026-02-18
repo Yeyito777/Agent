@@ -1,3 +1,14 @@
+<memory-metadata>
+{
+  "frequency": 62,
+  "last_accessed_session": 516,
+  "created_session": 0,
+  "appreciation": 0,
+  "pinned": true
+}
+</memory-metadata>
+
+<memory>
 Qutebrowser fork with custom QtWebEngine/Chromium build — source at ~/Workspace/Qutebrowser/, submodule chain (qtwebengine, chromium, pyqt6-webengine SIP bindings), install.sh build workflow, ladder-commit, reference docs (element shader, web settings, hinting, native elements, dwm-persist, tab-runtime), dwm persist integration (_DWM_SAVE_ARGV), tab runtime manager (filesystem IPC for live tab state), pytest testing. For runtime config see qutebrowser-runtime.md
 
 # Location
@@ -76,3 +87,4 @@ QT_QPA_PLATFORM=offscreen PYTHONPATH=. pytest tests/unit/path/to/test.py -v
 
 ---
 Update this memory when qutebrowser's submodule structure, build process, reference docs, or workflow changes.
+</memory>

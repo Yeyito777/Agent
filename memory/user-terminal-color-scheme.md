@@ -1,3 +1,14 @@
+<memory-metadata>
+{
+  "frequency": 12,
+  "last_accessed_session": 486,
+  "created_session": 0,
+  "appreciation": 0,
+  "pinned": false
+}
+</memory-metadata>
+
+<memory>
 st terminal color scheme — ocean-themed palette, hex values (#00050f through #f1faee), ANSI escape codes (\e[32m etc.), foreground/background/cursor defaults, color names for scripting and theming, defined in st config.h
 
 # Location
@@ -39,3 +50,4 @@ Defined in: `/home/yeyito/Config/st/config.h` (lines 99-131)
 
 ---
 Update this memory when the information above becomes outdated.
+</memory>

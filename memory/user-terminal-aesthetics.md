@@ -1,3 +1,14 @@
+<memory-metadata>
+{
+  "frequency": 20,
+  "last_accessed_session": 0,
+  "created_session": 0,
+  "appreciation": 0,
+  "pinned": false
+}
+</memory-metadata>
+
+<memory>
 Terminal visual style preferences — ASCII art banners, block letter branding, vertical color gradients, bold splash screens, CLI tool aesthetics, startup messages, "make it look nice" terminal output guidelines
 
 # Principles
@@ -27,3 +38,4 @@ Terminal visual style preferences — ASCII art banners, block letter branding, 
 
 ---
 Update this memory when the information above becomes outdated.
+</memory>

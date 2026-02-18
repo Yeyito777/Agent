@@ -1,4 +1,15 @@
-Agent memory system architecture — recall/update/forgetting hook agents, UserPromptSubmit opus subclaude for recall, session counter, memory-metadata JSON (frequency, appreciation, pinned), agent.conf toggles, cold storage archival to memory-cold/, hook recursion prevention, runtime files, debugging hooks
+<memory-metadata>
+{
+  "frequency": 47,
+  "last_accessed_session": 529,
+  "created_session": 0,
+  "appreciation": 0,
+  "pinned": true
+}
+</memory-metadata>
+
+<memory>
+Agent memory system architecture — recall/update/forgetting hook agents, UserPromptSubmit opus subclaude for recall, session counter, in-file memory-metadata (frequency, appreciation, pinned), agent.conf toggles, cold storage archival to memory-cold/, hook recursion prevention, runtime files, debugging hooks, memory_metadata.py
 
 # Overview
 Three hook-driven subagents, all toggleable via `agent.conf`:
@@ -24,9 +35,10 @@ Tracks how many sessions have been actively used (not just opened).
 - The recall hook compares `AGENT_HOOK_ID` against `runtime/session-last-increment` to detect first-message-of-session
 - On launch, `start.sh` shows a preview notification with `counter + 1` (the number it will become)
 
-## Memory metadata (`memory-metadata/`)
-Each `memory/*.md` file has a corresponding `memory-metadata/{name}.json`:
-```json
+## Memory metadata (in-file)
+Metadata is colocated inside each `memory/*.md` file using XML tags at the top:
+```
+<memory-metadata>
 {
   "frequency": 5,
   "last_accessed_session": 42,
@@ -34,6 +46,11 @@ Each `memory/*.md` file has a corresponding `memory-metadata/{name}.json`:
   "appreciation": 0,
   "pinned": false
 }
+</memory-metadata>
+
+<memory>
+...actual memory content...
+</memory>
 ```
 - `frequency` — incremented each time the recall hook surfaces the memory
 - `last_accessed_session` — updated to current session on each recall
@@ -41,7 +58,9 @@ Each `memory/*.md` file has a corresponding `memory-metadata/{name}.json`:
 - `appreciation` — bonus score, set manually or by the forgetting agent to protect a memory
 - `pinned` — if true, the forgetting agent will never consider this memory for archival
 
-`src/reconcile_metadata.py` keeps metadata in sync: creates defaults for new memories, deletes orphans for removed memories. Runs at every session start via `start.sh`.
+`src/memory_metadata.py` is the shared Python module for all metadata operations (read, write, ensure, get_description). It has a CLI interface for use from bash scripts.
+
+`src/reconcile_metadata.py` ensures every memory file has metadata tags (adds defaults if missing). Runs at every session start via `start.sh`. If a new memory is created without tags, reconcile adds them automatically.
 
 ## Standalone recall script (`src/recall.sh`)
 The source of truth for recall logic. Takes a user prompt on stdin, outputs recalled `memory/*.md` filenames to stdout (one per line). Used by the hook and by `benchmark/recall/run-benchmark.sh`.
@@ -49,7 +68,7 @@ The source of truth for recall logic. Takes a user prompt on stdin, outputs reca
 Supports two schemes configured via `agent.conf`:
 
 **Single scheme** (`MEMORY_RECALL_SCHEME=single`):
-1. Generates memory pointers via inline python (walks `memory/*.md`, reads first line as description)
+1. Generates memory pointers via `memory_metadata.get_description()` (reads first line inside `<memory>` tags)
 2. Loads prompt template from `prompts/<name>.md` (first name in `MEMORY_RECALL_PROMPTS`)
 3. Calls `claude -p --model <MODEL1> --max-turns 1 --no-session-persistence` with pointers + user prompt
 4. Parses response: validates files exist on disk, outputs valid filenames
@@ -79,7 +98,7 @@ Flow per message:
 3. Extracts prompt from stdin JSON via `jq`
 4. Pipes prompt into `src/recall.sh`, captures output
 5. Deduplicates against `recalled-<id>` ledger
-6. For each recalled memory, updates its metadata: increments `frequency`, sets `last_accessed_session`
+6. For each recalled memory, updates its in-file metadata via `memory_metadata.py`: increments `frequency`, sets `last_accessed_session`
 7. New memories appended to tracking file, output as `Relevant memories: memory/foo.md memory/bar.md`
 8. If memories were recalled and `AGENT_TERMINAL_PID` is set, fires one `st-notify` toast per memory (teal border on dark green bg, backgrounded)
 9. stdout with exit 0 = context injected into the main Claude session
@@ -96,7 +115,7 @@ Flow:
 3. Generates current memory pointers
 4. Spawns `claude -p --model opus --max-turns 15 --allowedTools "Read,Edit,Write,Glob,Bash(python3 *)"` with a strict system prompt
 5. System prompt emphasizes: if nothing needs updating, exit immediately without touching files
-6. If the subclaude does edit/create memories, it is instructed to run `python3 src/refresh_pointers.py` — however, this file no longer exists on disk (also commented out in `start.sh`)
+6. The subclaude is instructed to only edit content inside `<memory>` tags and never touch `<memory-metadata>` tags
 7. All output logged to `runtime/hook-<id>.log` with `[update]` prefix
 
 ## Forgetting hook (`src/hooks/forgetting-memories.sh`)
@@ -116,11 +135,10 @@ Flow:
    - Sends per-memory pink st-notify toasts for each archived memory: "Forgot memory/{name}.md"
 
 ## Cold storage (`memory-cold/`)
-When the forgetting agent archives a memory, both files are moved:
-- `memory/{name}.md` → `memory-cold/{name}.md`
-- `memory-metadata/{name}.json` → `memory-cold/{name}.json`
+When the forgetting agent archives a memory, the file is moved:
+- `memory/{name}.md` → `memory-cold/{name}.md` (metadata travels with the file since it's embedded)
 
-To restore: move both files back. The next reconciliation pass picks them up.
+To restore: move the file back to `memory/`. The next reconciliation pass picks it up.
 
 ## Cleanup hook (`src/hooks/cleanup-runtime.sh`)
 Wired to `SessionEnd`. Deletes `runtime/recalled-<id>` and `runtime/hook-<id>.log`.
@@ -158,14 +176,14 @@ If absent, hooks fall back to the defaults shown above.
 - `src/hooks/update-memories.sh` — update agent hook
 - `src/hooks/forgetting-memories.sh` — forgetting agent hook
 - `src/hooks/cleanup-runtime.sh` — cleanup hook
-- `src/reconcile_metadata.py` — metadata reconciliation (called by `start.sh`)
+- `src/memory_metadata.py` — shared Python module for in-file metadata operations (read, write, ensure, get_description)
+- `src/reconcile_metadata.py` — ensures all memory files have metadata tags (called by `start.sh`)
 - `.claude/settings.local.json` — hook wiring (project-local, gitignored by Claude Code)
 - `runtime/` — gitignored directory for session tracking files and logs
 - `runtime/session-counter` — global session count (persists across sessions)
 - `runtime/session-last-increment` — hook ID that last incremented the counter
 - `runtime/last-forgetting-session` — session number of last forgetting run
-- `memory-metadata/` — per-memory JSON metadata (git-tracked)
-- `memory-cold/` — archived memories + metadata (git-tracked)
+- `memory-cold/` — archived memories with embedded metadata (git-tracked)
 - `scripts/run-forgetting` — manual forgetting trigger
 - `scripts/run-validation` — manual validation trigger
 - `scripts/get-forgetting-candidates` — print lowest-scoring memories without running the agent
@@ -184,3 +202,4 @@ Log shows: prompt received, pointer count, opus response, each memory's accept/r
 
 ---
 Update this memory when hook scripts, settings, or the agent() startup flow change.
+</memory>

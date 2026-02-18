@@ -1,3 +1,14 @@
+<memory-metadata>
+{
+  "frequency": 54,
+  "last_accessed_session": 511,
+  "created_session": 0,
+  "appreciation": 0,
+  "pinned": true
+}
+</memory-metadata>
+
+<memory>
 st simple terminal fork — source at ~/Config/st/, code organization (st.c, x.c, vimnav.c, sshind.c, notif.c, persist.c, cmdline.c, search.c), vim navigation mode, SSH indicator overlay, notification popups, command-line mode (: colon command), regex search (/ forward ? backward, n/N navigation, :noh, live incremental search, scrollback history search), CWD tracking via OSC 779, dwm persist/save/restore, debug mode, make test, config.h, zsh vi-mode coordination, suckless build workflow
 
 # Location
@@ -69,3 +80,4 @@ New terminals pick up the updated binary; existing terminals are unaffected.
 
 ---
 Update this memory when st's code organization, features, build process, or testing setup changes.
+</memory>

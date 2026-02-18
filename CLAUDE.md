@@ -11,5 +11,7 @@ Relevant memories: memory/foo.md memory/bar.md
 # Creating memories
 If the user requests you to create a memory you must follow the following guideline:
 1. Create a kebab case markdown file in memory/ with a descriptive filename
-2. The first line must be a plaintext description that maximizes retrieval — it is the ONLY text the recall agent sees when deciding relevance. Front-load key nouns, tools, and concepts (e.g. "st-notify popup notification system — usage, options, wire protocol" not "How notifications work"). Include synonyms and related terms a user might mention. Keep it single-lined.
-3. Footer of the memory should be instructions on how to update the memory if anything becomes outdated
+2. Write only the memory content — just the text. The metadata pipeline will automatically add `<memory-metadata>` and `<memory>` tags on the next session start.
+3. The first line must be a plaintext description that maximizes retrieval — it is the ONLY text the recall agent sees when deciding relevance. Front-load key nouns, tools, and concepts (e.g. "st-notify popup notification system — usage, options, wire protocol" not "How notifications work"). Include synonyms and related terms a user might mention. Keep it single-lined.
+4. Footer of the memory should be instructions on how to update the memory if anything becomes outdated
+5. When editing existing memories, only modify content inside `<memory>` tags. Never modify `<memory-metadata>` tags — those are managed by the pipeline.

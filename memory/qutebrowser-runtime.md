@@ -1,3 +1,14 @@
+<memory-metadata>
+{
+  "frequency": 61,
+  "last_accessed_session": 516,
+  "created_session": 0,
+  "appreciation": 0,
+  "pinned": true
+}
+</memory-metadata>
+
+<memory>
 Qutebrowser runtime config and --basedir containerization — container at ~/.runtime/qutebrowser-yeyito/, directory structure (config/data/cache/download/runtime), config.py with whale theme, greasemonkey userscripts, CSS overrides, relative path requirement, Qt ghost directories, IPC socket isolation
 
 # Containerization
@@ -63,3 +74,4 @@ IPC socket name is MD5-hashed by basedir, so multiple container instances are fu
 
 ---
 Update this memory when the container path changes, new containers are created, or config.py structure changes significantly.
+</memory>

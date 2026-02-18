@@ -1,3 +1,14 @@
+<memory-metadata>
+{
+  "frequency": 19,
+  "last_accessed_session": 0,
+  "created_session": 139,
+  "appreciation": 0,
+  "pinned": false
+}
+</memory-metadata>
+
+<memory>
 clone-to-disk.sh live system cloning script — ~/Workspace/Utils/clone-to-disk.sh, rsync full/update/soft-update modes, USB disk cloning, GPT partitioning, EFI/GRUB bootloader, fstab UUID regeneration, swapfile creation, NetworkManager profile sanitization, .rsync-filter rules, disk backup, portable boot drive
 
 # clone-to-disk.sh
@@ -41,3 +52,4 @@ Clones the live root filesystem to a target disk (default `/dev/sda`) using rsyn
 
 ---
 **Keeping this memory up to date:** If modes, excludes, post-rsync steps, or partition layout change in clone-to-disk.sh, update the relevant section. If new sanitization steps are added (e.g. machine-id regeneration), add them under Post-Rsync Sanitization.
+</memory>

@@ -1,3 +1,14 @@
+<memory-metadata>
+{
+  "frequency": 10,
+  "last_accessed_session": 0,
+  "created_session": 0,
+  "appreciation": 1,
+  "pinned": false
+}
+</memory-metadata>
+
+<memory>
 dmenu scripting and usage guide — stdin|dmenu|action pattern, writing new dmenu scripts in ~/.local/bin/, dwm keybindings, flags (-c center, -l lines, -p prompt, -t truncate), appearance config, clipmenu integration, adding dmenu commands to dwm config.h
 
 # What dmenu is
@@ -49,3 +60,4 @@ Callers pass flags to change dmenu's layout per invocation:
 
 ---
 Update this memory when new dmenu scripts are added or the workflow changes.
+</memory>

@@ -1,3 +1,14 @@
+<memory-metadata>
+{
+  "frequency": 7,
+  "last_accessed_session": 483,
+  "created_session": 0,
+  "appreciation": 0,
+  "pinned": false
+}
+</memory-metadata>
+
+<memory>
 Linux swap file setup — 16GB /swapfile, fstab configuration, swappiness default 60, create/remove/resize swap commands, OOM prevention for heavy builds, clone-to-disk.sh integration for disk cloning
 
 # Swap File Configuration
@@ -38,3 +49,4 @@ sudo swapon /swapfile
 
 ---
 **Keeping this memory up to date:** If the swapfile size, location, or swappiness is changed, update this file. If the clone script swap logic changes, update the "Clone Script Integration" section.
+</memory>

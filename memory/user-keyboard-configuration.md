@@ -1,3 +1,14 @@
+<memory-metadata>
+{
+  "frequency": 15,
+  "last_accessed_session": 510,
+  "created_session": 0,
+  "appreciation": 0,
+  "pinned": true
+}
+</memory-metadata>
+
+<memory>
 Keyboard configuration — keyd remappings (caps lock to escape, escape to F13), key repeat rate (startx -ardelay 200 -arinterval 22), right shift zsh autosuggestion in st, XKB F13 fix with pacman hook, lock-keyboard-daemon, /etc/keyd/default.conf, keysym, xmodmap alternative
 
 # Remappings (kernel-level via keyd)
@@ -52,3 +63,4 @@ Keyboard configuration — keyd remappings (caps lock to escape, escape to F13),
 If anything changes (new remappings, different repeat rate, switching away from keyd), update this file.
 If st's right shift behavior changes, update the "Right Shift in st" section.
 If lock-keyboard-daemon changes, update the "lock-keyboard-daemon" section.
+</memory>

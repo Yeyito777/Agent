@@ -1,3 +1,14 @@
+<memory-metadata>
+{
+  "frequency": 32,
+  "last_accessed_session": 529,
+  "created_session": 73,
+  "appreciation": 0,
+  "pinned": false
+}
+</memory-metadata>
+
+<memory>
 Manual testing Agent hooks in unique temp clone — running hooks manually with env vars (CLAUDE_PROJECT_DIR, AGENT_HOOK_ID, AGENT_TERMINAL_PID), bash -x tracing, mock memories and metadata, controlling runtime state (session-counter, last-forgetting-session, last-validation-session), st-notify notification testing, isolated sandbox
 
 # Setup
@@ -114,3 +125,4 @@ From manual testing with mock memories (3 rounds, 9 memories total):
 
 ---
 Update this memory when the manual testing methodology or Agent hook structure changes.
+</memory>

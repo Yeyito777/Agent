@@ -1,3 +1,14 @@
+<memory-metadata>
+{
+  "frequency": 7,
+  "last_accessed_session": 0,
+  "created_session": 0,
+  "appreciation": 0,
+  "pinned": false
+}
+</memory-metadata>
+
+<memory>
 systemd watchdog "did not stop!" shutdown message — sp5100_tco AMD TCO timer module, RebootWatchdogSec=off fix in /etc/systemd/system.conf, systemd 259 behavior change, hardware watchdog for future server repurposing, poweroff/reboot warning
 
 # Watchdog Shutdown Message
@@ -33,3 +44,4 @@ This will auto-reboot the machine if systemd hangs for 30 seconds, and ensure sh
 
 ---
 **Keeping this memory up to date:** If systemd is upgraded and behavior changes again, or if the machine is converted to a server and watchdog settings are re-enabled, update this file.
+</memory>

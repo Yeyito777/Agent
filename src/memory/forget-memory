@@ -21,7 +21,6 @@ fi
 
 MEM_FILE="${AGENT_DIR}/${TARGET}"
 MEM_NAME=$(basename "$TARGET" .md)
-META_FILE="${AGENT_DIR}/memory-metadata/${MEM_NAME}.json"
 COLD_DIR="${AGENT_DIR}/memory-cold"
 
 if [[ ! -f "$MEM_FILE" ]]; then
@@ -31,7 +30,6 @@ fi
 
 mkdir -p "$COLD_DIR"
 mv "$MEM_FILE" "${COLD_DIR}/${MEM_NAME}.md"
-[[ -f "$META_FILE" ]] && mv "$META_FILE" "${COLD_DIR}/${MEM_NAME}.json"
 
 echo "Archived $TARGET to memory-cold/"
 

@@ -1,3 +1,14 @@
+<memory-metadata>
+{
+  "frequency": 57,
+  "last_accessed_session": 0,
+  "created_session": 0,
+  "appreciation": 0,
+  "pinned": true
+}
+</memory-metadata>
+
+<memory>
 dwm dynamic window manager fork — source at ~/Config/dwm/, tiling WM, config.h keybindings/layouts/rules, suckless build workflow, NEVER send signals to dwm (kills X session), dwmblocks status bar, reference docs (spawn-term-here, persist-mode), restart warning
 
 # Location
@@ -52,3 +63,4 @@ No need for `make clean` — just `make && sudo make install`.
 
 ---
 Update this memory when dwm's code organization, build process, or restart workflow changes.
+</memory>

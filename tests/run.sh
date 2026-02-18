@@ -445,24 +445,32 @@ setup_min_age_memories() {
   local session="$1"
   echo "$session" > "$TEST_DIR/runtime/session-counter"
   # Young memory (10 sessions old — below default 50 threshold)
-  echo "Young test memory" > "$TEST_DIR/memory/test-young.md"
-  cat > "$TEST_DIR/memory-metadata/test-young.json" << EOF
-{ "frequency": 0, "last_accessed_session": 0, "created_session": $((session - 10)), "appreciation": 0, "pinned": false }
-EOF
+  python3 -c "
+import sys; sys.path.insert(0, '$TEST_DIR/src')
+from memory_metadata import ensure_structure
+import json
+meta = {'frequency': 0, 'last_accessed_session': 0, 'created_session': $((session - 10)), 'appreciation': 0, 'pinned': False}
+content = ensure_structure('Young test memory\n', meta)
+open('$TEST_DIR/memory/test-young.md', 'w').write(content)
+"
   # Old memory (99 sessions old — above default 50 threshold)
-  echo "Old test memory" > "$TEST_DIR/memory/test-old.md"
-  cat > "$TEST_DIR/memory-metadata/test-old.json" << EOF
-{ "frequency": 0, "last_accessed_session": 0, "created_session": $((session - 99)), "appreciation": 0, "pinned": false }
-EOF
+  python3 -c "
+import sys; sys.path.insert(0, '$TEST_DIR/src')
+from memory_metadata import ensure_structure
+import json
+meta = {'frequency': 0, 'last_accessed_session': 0, 'created_session': $((session - 99)), 'appreciation': 0, 'pinned': False}
+content = ensure_structure('Old test memory\n', meta)
+open('$TEST_DIR/memory/test-old.md', 'w').write(content)
+"
 }
 
 cleanup_min_age_memories() {
-  rm -f "$TEST_DIR/memory/test-young.md" "$TEST_DIR/memory-metadata/test-young.json"
-  rm -f "$TEST_DIR/memory/test-old.md" "$TEST_DIR/memory-metadata/test-old.json"
-  rm -f "$TEST_DIR/memory/test-age49.md" "$TEST_DIR/memory-metadata/test-age49.json"
-  rm -f "$TEST_DIR/memory/test-age50.md" "$TEST_DIR/memory-metadata/test-age50.json"
-  rm -f "$TEST_DIR/memory/test-age19.md" "$TEST_DIR/memory-metadata/test-age19.json"
-  rm -f "$TEST_DIR/memory/test-age30.md" "$TEST_DIR/memory-metadata/test-age30.json"
+  rm -f "$TEST_DIR/memory/test-young.md"
+  rm -f "$TEST_DIR/memory/test-old.md"
+  rm -f "$TEST_DIR/memory/test-age49.md"
+  rm -f "$TEST_DIR/memory/test-age50.md"
+  rm -f "$TEST_DIR/memory/test-age19.md"
+  rm -f "$TEST_DIR/memory/test-age30.md"
 }
 
 run_candidates() {
@@ -491,15 +499,19 @@ test_forgetting_excludes_young_memories() {
 test_forgetting_min_age_boundary() {
   echo "100" > "$TEST_DIR/runtime/session-counter"
   # Age = 49 (created_session=51) — should be excluded
-  echo "Boundary 49" > "$TEST_DIR/memory/test-age49.md"
-  cat > "$TEST_DIR/memory-metadata/test-age49.json" << EOF
-{ "frequency": 0, "last_accessed_session": 0, "created_session": 51, "appreciation": 0, "pinned": false }
-EOF
+  python3 -c "
+import sys; sys.path.insert(0, '$TEST_DIR/src')
+from memory_metadata import ensure_structure
+meta = {'frequency': 0, 'last_accessed_session': 0, 'created_session': 51, 'appreciation': 0, 'pinned': False}
+open('$TEST_DIR/memory/test-age49.md', 'w').write(ensure_structure('Boundary 49\n', meta))
+"
   # Age = 50 (created_session=50) — should be included
-  echo "Boundary 50" > "$TEST_DIR/memory/test-age50.md"
-  cat > "$TEST_DIR/memory-metadata/test-age50.json" << EOF
-{ "frequency": 0, "last_accessed_session": 0, "created_session": 50, "appreciation": 0, "pinned": false }
-EOF
+  python3 -c "
+import sys; sys.path.insert(0, '$TEST_DIR/src')
+from memory_metadata import ensure_structure
+meta = {'frequency': 0, 'last_accessed_session': 0, 'created_session': 50, 'appreciation': 0, 'pinned': False}
+open('$TEST_DIR/memory/test-age50.md', 'w').write(ensure_structure('Boundary 50\n', meta))
+"
   local out
   out=$(run_candidates)
   if echo "$out" | grep -qF "test-age49"; then
@@ -518,15 +530,19 @@ test_forgetting_min_age_configurable() {
   echo "MEMORY_FORGETTING_MIN_AGE=20" >> "$TEST_DIR/agent.conf"
   echo "100" > "$TEST_DIR/runtime/session-counter"
   # Age = 19 (created_session=81) — should be excluded with min_age=20
-  echo "Age 19" > "$TEST_DIR/memory/test-age19.md"
-  cat > "$TEST_DIR/memory-metadata/test-age19.json" << EOF
-{ "frequency": 0, "last_accessed_session": 0, "created_session": 81, "appreciation": 0, "pinned": false }
-EOF
+  python3 -c "
+import sys; sys.path.insert(0, '$TEST_DIR/src')
+from memory_metadata import ensure_structure
+meta = {'frequency': 0, 'last_accessed_session': 0, 'created_session': 81, 'appreciation': 0, 'pinned': False}
+open('$TEST_DIR/memory/test-age19.md', 'w').write(ensure_structure('Age 19\n', meta))
+"
   # Age = 30 (created_session=70) — should be included with min_age=20
-  echo "Age 30" > "$TEST_DIR/memory/test-age30.md"
-  cat > "$TEST_DIR/memory-metadata/test-age30.json" << EOF
-{ "frequency": 0, "last_accessed_session": 0, "created_session": 70, "appreciation": 0, "pinned": false }
-EOF
+  python3 -c "
+import sys; sys.path.insert(0, '$TEST_DIR/src')
+from memory_metadata import ensure_structure
+meta = {'frequency': 0, 'last_accessed_session': 0, 'created_session': 70, 'appreciation': 0, 'pinned': False}
+open('$TEST_DIR/memory/test-age30.md', 'w').write(ensure_structure('Age 30\n', meta))
+"
   local out
   out=$(run_candidates)
   if echo "$out" | grep -qF "test-age19"; then
@@ -554,16 +570,13 @@ run_tool() {
 
 create_test_memory() {
   local name="$1"
-  echo "Test memory — $name" > "$TEST_DIR/memory/${name}.md"
-  cat > "$TEST_DIR/memory-metadata/${name}.json" << EOF
-{
-  "frequency": 3,
-  "last_accessed_session": 10,
-  "created_session": 1,
-  "appreciation": 0,
-  "pinned": false
-}
-EOF
+  python3 -c "
+import sys; sys.path.insert(0, '$TEST_DIR/src')
+from memory_metadata import ensure_structure
+meta = {'frequency': 3, 'last_accessed_session': 10, 'created_session': 1, 'appreciation': 0, 'pinned': False}
+content = ensure_structure('Test memory — $name\n', meta)
+open('$TEST_DIR/memory/${name}.md', 'w').write(content)
+"
 }
 
 # --- forget-memory tests ---
@@ -576,11 +589,9 @@ test_forget_memory_happy_path() {
   assert_exit_code "$rc" 0 "exits 0 on success"
   assert_output_contains "$out" "Archived memory/test-forget-target.md to memory-cold/" "prints archive message"
   assert_file_exists "$TEST_DIR/memory-cold/test-forget-target.md" "memory moved to cold storage"
-  assert_file_exists "$TEST_DIR/memory-cold/test-forget-target.json" "metadata moved to cold storage"
   assert_file_not_exists "$TEST_DIR/memory/test-forget-target.md" "memory removed from memory/"
-  assert_file_not_exists "$TEST_DIR/memory-metadata/test-forget-target.json" "metadata removed from memory-metadata/"
   # cleanup
-  rm -f "$TEST_DIR/memory-cold/test-forget-target.md" "$TEST_DIR/memory-cold/test-forget-target.json"
+  rm -f "$TEST_DIR/memory-cold/test-forget-target.md"
 }
 
 test_forget_memory_no_args() {
@@ -611,16 +622,14 @@ test_forget_memory_extra_args() {
   assert_output_contains "$out" "expected exactly 1 argument" "shows arg count error"
 }
 
-test_forget_memory_no_metadata() {
-  # Memory exists but metadata doesn't — should still archive the .md
-  echo "orphan memory" > "$TEST_DIR/memory/test-orphan.md"
-  rm -f "$TEST_DIR/memory-metadata/test-orphan.json"
+test_forget_memory_no_metadata_tags() {
+  # Memory exists but has no <memory-metadata> tags — should still archive
+  echo "orphan memory without tags" > "$TEST_DIR/memory/test-orphan.md"
   local out
   out=$(run_tool forget-memory "memory/test-orphan.md")
   local rc=$?
-  assert_exit_code "$rc" 0 "exits 0 even without metadata"
+  assert_exit_code "$rc" 0 "exits 0 even without metadata tags"
   assert_file_exists "$TEST_DIR/memory-cold/test-orphan.md" "memory moved to cold storage"
-  assert_file_not_exists "$TEST_DIR/memory-cold/test-orphan.json" "no metadata file created in cold storage"
   # cleanup
   rm -f "$TEST_DIR/memory-cold/test-orphan.md"
 }
@@ -634,19 +643,24 @@ test_appreciate_memory_happy_path() {
   local rc=$?
   assert_exit_code "$rc" 0 "exits 0 on success"
   assert_output_contains "$out" "Bumped appreciation of memory/test-appreciate-target.md by +2 (now 2)" "prints bump message"
-  # Verify JSON was updated
+  # Verify in-file metadata was updated
   local appr
-  appr=$(python3 -c "import json; print(json.load(open('$TEST_DIR/memory-metadata/test-appreciate-target.json'))['appreciation'])")
+  appr=$(python3 -c "
+import sys; sys.path.insert(0, '$TEST_DIR/src')
+from memory_metadata import read_metadata
+from pathlib import Path
+print(read_metadata(Path('$TEST_DIR/memory/test-appreciate-target.md'))['appreciation'])
+")
   if [[ "$appr" == "2" ]]; then
-    echo -e "  ${GREEN}PASS${RESET}  appreciation updated in metadata JSON"
+    echo -e "  ${GREEN}PASS${RESET}  appreciation updated in-file metadata"
     PASS=$((PASS + 1))
   else
-    echo -e "  ${RED}FAIL${RESET}  appreciation updated in metadata JSON"
+    echo -e "  ${RED}FAIL${RESET}  appreciation updated in-file metadata"
     echo "        expected: 2, actual: $appr"
     FAIL=$((FAIL + 1))
   fi
   # cleanup
-  rm -f "$TEST_DIR/memory/test-appreciate-target.md" "$TEST_DIR/memory-metadata/test-appreciate-target.json"
+  rm -f "$TEST_DIR/memory/test-appreciate-target.md"
 }
 
 test_appreciate_memory_stacks() {
@@ -658,7 +672,7 @@ test_appreciate_memory_stacks() {
   assert_exit_code "$rc" 0 "exits 0 on second bump"
   assert_output_contains "$out" "now 4" "appreciation stacks (1+3=4)"
   # cleanup
-  rm -f "$TEST_DIR/memory/test-appreciate-stack.md" "$TEST_DIR/memory-metadata/test-appreciate-stack.json"
+  rm -f "$TEST_DIR/memory/test-appreciate-stack.md"
 }
 
 test_appreciate_memory_no_args() {
@@ -689,7 +703,7 @@ test_appreciate_memory_zero_amount() {
   assert_exit_code "$rc" 1 "exits 1 with zero amount"
   assert_output_contains "$out" "must be a positive integer" "shows integer error"
   # cleanup
-  rm -f "$TEST_DIR/memory/test-appreciate-zero.md" "$TEST_DIR/memory-metadata/test-appreciate-zero.json"
+  rm -f "$TEST_DIR/memory/test-appreciate-zero.md"
 }
 
 test_appreciate_memory_non_integer() {
@@ -699,16 +713,17 @@ test_appreciate_memory_non_integer() {
   assert_exit_code "$rc" 1 "exits 1 with non-integer"
   assert_output_contains "$out" "must be a positive integer" "shows integer error for string"
   # cleanup
-  rm -f "$TEST_DIR/memory/test-appreciate-nan.md" "$TEST_DIR/memory-metadata/test-appreciate-nan.json"
+  rm -f "$TEST_DIR/memory/test-appreciate-nan.md"
 }
 
-test_appreciate_memory_no_metadata() {
-  echo "orphan memory" > "$TEST_DIR/memory/test-no-meta.md"
-  rm -f "$TEST_DIR/memory-metadata/test-no-meta.json"
+test_appreciate_memory_no_metadata_tags() {
+  # Memory without <memory-metadata> tags — appreciate should still work
+  # because memory_metadata.py returns defaults for missing tags
+  echo "orphan memory without tags" > "$TEST_DIR/memory/test-no-meta.md"
   local out rc
   out=$(run_tool appreciate-memory "memory/test-no-meta.md" 1) && rc=$? || rc=$?
-  assert_exit_code "$rc" 1 "exits 1 without metadata"
-  assert_output_contains "$out" "metadata file" "shows metadata error"
+  assert_exit_code "$rc" 0 "exits 0 and creates metadata tags"
+  assert_output_contains "$out" "now 1" "appreciation set to 1"
   # cleanup
   rm -f "$TEST_DIR/memory/test-no-meta.md"
 }
@@ -846,7 +861,7 @@ run_test "forget-memory: no args"                        test_forget_memory_no_a
 run_test "forget-memory: wrong format"                   test_forget_memory_wrong_format
 run_test "forget-memory: nonexistent file"               test_forget_memory_nonexistent
 run_test "forget-memory: extra args"                     test_forget_memory_extra_args
-run_test "forget-memory: no metadata"                    test_forget_memory_no_metadata
+run_test "forget-memory: no metadata tags"                test_forget_memory_no_metadata_tags
 run_test "appreciate-memory: happy path"                 test_appreciate_memory_happy_path
 run_test "appreciate-memory: stacks"                     test_appreciate_memory_stacks
 run_test "appreciate-memory: no args"                    test_appreciate_memory_no_args
@@ -854,7 +869,7 @@ run_test "appreciate-memory: wrong format"               test_appreciate_memory_
 run_test "appreciate-memory: nonexistent file"           test_appreciate_memory_nonexistent
 run_test "appreciate-memory: zero amount"                test_appreciate_memory_zero_amount
 run_test "appreciate-memory: non-integer amount"         test_appreciate_memory_non_integer
-run_test "appreciate-memory: no metadata"                test_appreciate_memory_no_metadata
+run_test "appreciate-memory: no metadata tags"            test_appreciate_memory_no_metadata_tags
 
 # Custom schedule tests
 run_test "validation: custom schedule triggers"          test_validation_custom_schedule

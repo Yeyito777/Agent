@@ -1,3 +1,14 @@
+<memory-metadata>
+{
+  "frequency": 15,
+  "last_accessed_session": 0,
+  "created_session": 0,
+  "appreciation": 0,
+  "pinned": true
+}
+</memory-metadata>
+
+<memory>
 dmenu suckless dynamic menu launcher — patched fork at ~/Config/dmenu/, config.h colors fonts prompt, vi-mode center border patches, build install (make && sudo make install), code layout dmenu.c drw.c stest.c util.c arg.h, dmenu_run dmenu_path scripts, application launcher, fuzzy picker, no test suite
 
 # Location
@@ -41,3 +52,4 @@ Takes effect immediately on next invocation — no restart needed.
 
 ---
 Update this memory when dmenu's patches, code organization, or build process changes.
+</memory>

@@ -17,6 +17,10 @@ import sys
 from difflib import SequenceMatcher
 from pathlib import Path
 
+# Add src/ to path for memory_metadata import
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from memory_metadata import get_description
+
 STOP_WORDS = {
     # articles
     'a', 'an', 'the',
@@ -222,10 +226,10 @@ def main():
     matched = 0
     for f in mem_files:
         text = f.read_text()
-        first_line = text.split('\n')[0].strip()
+        desc = get_description(f)
         stem = f.stem.replace('-', ' ')
 
-        search_text = (stem + ' ' + first_line).lower()
+        search_text = (stem + ' ' + desc).lower()
         if include_content:
             search_text += ' ' + text.lower()
 
@@ -233,7 +237,7 @@ def main():
 
         # A memory matches if ANY keyword matches it
         if any(word_matches_target(kw, search_tokens, search_text) for kw in keywords):
-            print(f'- memory/{f.name} \u2014 {first_line}')
+            print(f'- memory/{f.name} \u2014 {desc}')
             matched += 1
 
     json.dump({"keywords": keywords, "matched": matched, "total": total, "pass_all": False},

@@ -1,3 +1,14 @@
+<memory-metadata>
+{
+  "frequency": 17,
+  "last_accessed_session": 0,
+  "created_session": 0,
+  "appreciation": 0,
+  "pinned": false
+}
+</memory-metadata>
+
+<memory>
 Claude Code binary inspection — ELF binary location (~/.local/share/claude/versions/), extracting minified JS via strings, safe search method (dump to /tmp first, never pipe directly), BASH_DEFAULT_TIMEOUT_MS/BASH_MAX_TIMEOUT_MS env vars, avoiding event loop crash from stdout flooding
 
 # Binary Location
@@ -63,3 +74,4 @@ Key findings:
 
 ---
 Update this memory when the information above becomes outdated.
+</memory>

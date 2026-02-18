@@ -1,3 +1,14 @@
+<memory-metadata>
+{
+  "frequency": 35,
+  "last_accessed_session": 0,
+  "created_session": 187,
+  "appreciation": 0,
+  "pinned": false
+}
+</memory-metadata>
+
+<memory>
 ~/.runtime/ persistence directory — dwm save/restore, st scrollback/CWD/cursor persistence, dwm-backup, qutebrowser basedir container, .save files, tag directories, per-terminal state, dwm.log, session survival across restarts
 
 # Location
@@ -39,3 +50,4 @@
 
 ---
 Update this memory when the runtime directory structure, save file format, or the save/restore cycle changes.
+</memory>

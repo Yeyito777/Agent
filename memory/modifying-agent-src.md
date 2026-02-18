@@ -1,3 +1,14 @@
+<memory-metadata>
+{
+  "frequency": 49,
+  "last_accessed_session": 529,
+  "created_session": 0,
+  "appreciation": 0,
+  "pinned": false
+}
+</memory-metadata>
+
+<memory>
 Agent src/ and scripts/ modification guide — adding new hooks, registering new scripts, renaming moving deleting files in src/ and scripts/, external references table (start.sh zshrc alias, hook scripts in .claude/settings.local.json, reconcile_metadata.py), startup boot flow (agent alias → start.sh → reconcile → claude launch), hooks wiring (recall-memories save-cmd update-memories forgetting-memories cleanup-runtime validation-memories), scripts/ runner utilities, checklist for keeping paths and references in sync across Agent codebase
 
 # External References
@@ -13,6 +24,7 @@ Files **outside** Agent that reference files inside `src/`. Update these when re
 | `hooks/forgetting-memories.sh` | SessionStart hook (async) | `.claude/settings.local.json` |
 | `hooks/cleanup-runtime.sh` | SessionEnd hook | `.claude/settings.local.json` |
 | `hooks/validation-memories.sh` | SessionStart hook (async) | `.claude/settings.local.json` |
+| `memory_metadata.py` | All hooks, reconcile, presearch, recall | imported by all metadata consumers |
 | `reconcile_metadata.py` | `src/start.sh` | `src/start.sh` line ~44 |
 
 # Startup Flow
@@ -36,3 +48,4 @@ Runner utilities that wrap hook scripts for manual invocation:
 
 ---
 Update this memory when the information above becomes outdated.
+</memory>

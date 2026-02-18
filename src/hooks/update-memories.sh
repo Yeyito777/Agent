@@ -72,11 +72,13 @@ log "Extracted $(echo "$CONVERSATION" | wc -l) messages from transcript"
 # --- Generate memory pointers ---
 POINTERS=$(python3 - "$AGENT_DIR" <<'PYEOF'
 import sys
+sys.path.insert(0, sys.argv[1] + '/src')
 from pathlib import Path
+from memory_metadata import get_description
 d = Path(sys.argv[1]) / "memory"
 if d.exists():
     for f in sorted(d.glob("*.md")):
-        desc = f.read_text().split("\n")[0].strip()
+        desc = get_description(f)
         print(f"- memory/{f.name} — {desc}")
 PYEOF
 ) || { log "SKIP: pointer generation failed"; exit 0; }
@@ -95,9 +97,9 @@ CRITICAL RULES:
 3. Only create a new memory if a genuinely new topic was discussed that the user would want persisted long-term.
 4. Do NOT make cosmetic changes, reformat, reorganize, or "improve" existing memories.
 5. Do NOT create memories about transient things (one-off questions, debugging sessions, casual chat).
-6. Each memory file format: first line = plaintext description of what the memory is about, footer = "---\nUpdate this memory when the information above becomes outdated."
-7. New memory filenames must be kebab-case in memory/.
-8. After making ANY file changes, you MUST run: python3 src/refresh_pointers.py
+6. Memory file format: <memory-metadata> JSON block at top (managed by the pipeline — do NOT touch), then <memory> block containing the actual content. The first line inside <memory> = plaintext description for recall, footer = "---\nUpdate this memory when the information above becomes outdated."
+7. New memory filenames must be kebab-case in memory/. When creating a new file, just write the content — the metadata pipeline will add <memory-metadata> tags automatically.
+8. Only edit content inside <memory> tags. Never modify <memory-metadata> tags.
 
 Current memories:
 ${POINTERS}

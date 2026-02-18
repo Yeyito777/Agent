@@ -1,3 +1,14 @@
+<memory-metadata>
+{
+  "frequency": 14,
+  "last_accessed_session": 492,
+  "created_session": 0,
+  "appreciation": 1,
+  "pinned": false
+}
+</memory-metadata>
+
+<memory>
 Arch Linux disk audit and cleanup — NVMe partition usage breakdown, cleanup candidates (pip/qutebrowser/go/yay caches, build artifacts, pacman cache, coredumps, orphaned packages), du/paccache/journalctl commands, per-directory size analysis, safe vs risky cleanup actions, disk space, storage
 
 ## System layout
@@ -144,3 +155,4 @@ bun pm cache rm
 ---
 
 To keep this memory current: re-run the disk audit (`du -sh` commands above) and update sizes/candidates as the system changes. Add new anomalies or large directories as they appear. Remove entries for things that have already been cleaned.
+</memory>

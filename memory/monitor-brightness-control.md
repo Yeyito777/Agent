@@ -1,3 +1,14 @@
+<memory-metadata>
+{
+  "frequency": 5,
+  "last_accessed_session": 0,
+  "created_session": 360,
+  "appreciation": 0,
+  "pinned": false
+}
+</memory-metadata>
+
+<memory>
 Monitor brightness control — DDC/CI, ddcutil, ddcutil-service D-Bus daemon, busctl, VCP feature 0x10 0x12 contrast, ASUS VG328 external monitor, I2C bus 6 /dev/i2c-6, i2c-dev kernel module, ~/.local/bin/brightness script wrapper, MCCS protocol, screen dimming display backlight, brightnessctl alternative, set get increase decrease percentage, caching debounce flock, Arch Linux pacman AUR packages
 
 ## Why not brightnessctl?
@@ -65,3 +76,4 @@ Clamps values to 0-100. Caches current brightness in `/tmp/brightness-val` to av
 
 ---
 *To update: if the monitor, I2C bus number, or D-Bus interface changes, update the hardware details and D-Bus coordinates above. If the brightness script at ~/.local/bin/brightness is modified, update the script section.*
+</memory>

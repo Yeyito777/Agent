@@ -1,3 +1,14 @@
+<memory-metadata>
+{
+  "frequency": 16,
+  "last_accessed_session": 529,
+  "created_session": 142,
+  "appreciation": 2,
+  "pinned": false
+}
+</memory-metadata>
+
+<memory>
 Recall benchmark system — benchmark/recall/, autogenerate.sh, run-benchmark.sh, src/recall.sh standalone recall script, .bench file format, .result scoring, recall-prompts.md prompt version log, testing recall accuracy, prompts/ directory
 
 # Overview
@@ -47,3 +58,4 @@ Result files contain a `[summary]` with aggregate stats (counts, percentages, to
 
 ---
 Update this memory when benchmark scripts, file formats, or scoring logic change.
+</memory>

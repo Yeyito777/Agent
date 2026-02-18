@@ -1,3 +1,14 @@
+<memory-metadata>
+{
+  "frequency": 3,
+  "last_accessed_session": 489,
+  "created_session": 406,
+  "appreciation": 0,
+  "pinned": false
+}
+</memory-metadata>
+
+<memory>
 SSH remote access setup — key-based auth, port forwarding, fail2ban, sshd hardening, remote machine 192.168.0.100 whale kitsune, public IP dynamic via DHCP, kitsune.yeyito.dev DDNS via DNSimple, port 48222, ~/.ssh/config aliases kitsune kitsune-local, ed25519 key, no password auth
 
 ## Machines
@@ -73,3 +84,4 @@ backend = systemd
 
 ## Updating this memory
 If the DDNS setup changes (new record ID, different domain), update the Dynamic DNS section. If additional hardening is added (e.g. changing the SSH port on the server itself, adding more AllowUsers), update the sshd section. If the DNSimple-config repo moves or the script changes, update the paths.
+</memory>

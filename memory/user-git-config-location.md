@@ -1,3 +1,14 @@
+<memory-metadata>
+{
+  "frequency": 61,
+  "last_accessed_session": 527,
+  "created_session": 0,
+  "appreciation": 0,
+  "pinned": true
+}
+</memory-metadata>
+
+<memory>
 Git configuration — non-default gitconfig path at ~/.config/git/.gitconfig, GIT_CONFIG_GLOBAL env var, git-credentials location, aliases (s=status, sync=pull+push)
 
 # Location
@@ -22,3 +33,4 @@ Stored at: `~/.config/git/.git-credentials`
 
 ---
 Update this memory when the information above becomes outdated.
+</memory>

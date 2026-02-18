@@ -1,3 +1,14 @@
+<memory-metadata>
+{
+  "frequency": 14,
+  "last_accessed_session": 0,
+  "created_session": 0,
+  "appreciation": 0,
+  "pinned": true
+}
+</memory-metadata>
+
+<memory>
 st-notify popup notification system — usage and options (--timeout, --border, --background, --foreground, --textsize), _ST_NOTIFY X11 property wire protocol, xprop/xdotool, toast stacking, default appearance, sending notifications from shell scripts to st terminal
 
 # Location
@@ -68,3 +79,4 @@ Requires `xdotool` and `xprop` to be installed.
 
 ---
 Update this memory when st-notify options, wire protocol, or defaults change.
+</memory>

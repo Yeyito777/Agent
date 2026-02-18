@@ -1,3 +1,14 @@
+<memory-metadata>
+{
+  "frequency": 7,
+  "last_accessed_session": 347,
+  "created_session": 0,
+  "appreciation": 0,
+  "pinned": false
+}
+</memory-metadata>
+
+<memory>
 Supcord decentralized Discord alternative — Rust Axum backend, React TypeScript Vite frontend, Tauri v2 desktop app, Ed25519 identity, SQLite storage, WebSocket JSON protocol, privacy-first chat at ~/Workspace/Supcord, Phase 1 complete, E2EE planned
 
 # Motivation
@@ -63,3 +74,4 @@ Tauri requires: gtk3, webkit2gtk-4.1, libappindicator-gtk3, librsvg. See `refere
 
 ---
 Update this memory when the project structure, architecture decisions, tech stack, or current phase changes significantly.
+</memory>

@@ -88,11 +88,14 @@ if [[ "$PRESEARCH" == "on" ]]; then
   rm -f "$PRESEARCH_STDERR"
 else
   POINTERS=$(python3 -c "
+import sys
+sys.path.insert(0, '${AGENT_DIR}/src')
 from pathlib import Path
+from memory_metadata import get_description
 d = Path('${MEMORY_DIR}')
 if d.exists():
     for f in sorted(d.glob('*.md')):
-        desc = f.read_text().split('\n')[0].strip()
+        desc = get_description(f)
         print(f'- memory/{f.name} — {desc}')
 " 2>/dev/null) || { echo "Error: pointer generation failed" >&2; exit 1; }
 fi
