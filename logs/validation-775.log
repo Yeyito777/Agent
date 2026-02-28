@@ -1,0 +1,10 @@
+Done. The subagent verified **`st-notify-system.md`** and found it **fully accurate** — no changes were needed.
+
+**Verified items:**
+- All 4 file paths (`notif.c`, `notif.h`, `st-notify` script, `notifications.md`) — all exist
+- All script options (`--timeout`, `--border`, `--background`, `--foreground`, `--textsize`, `--help`) and short forms — all match
+- Wire protocol format (separators `\x1f`/`\x1e`, keys `t`, `b`, `bg`, `fg`, `ts`) — matches source exactly
+- All default values (border color, width, bg, fg, font scale, timeout, margin, padding, toast gap) — match `notif.h`
+- Toast stacking behavior (newest on top, max 8, oldest evicted) — matches `notif.c`
+- Dependencies (`xdotool`, `xprop`) — both installed
+- Build command — Makefile confirmed

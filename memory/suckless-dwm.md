@@ -1,7 +1,7 @@
 <memory-metadata>
 {
-  "frequency": 59,
-  "last_accessed_session": 0,
+  "frequency": 73,
+  "last_accessed_session": 1165,
   "created_session": 0,
   "appreciation": 0,
   "pinned": true
@@ -44,6 +44,7 @@ Located in `reference/` — always read these before touching related features:
 - `spawn-term-here.md` — spawning terminals in the current working directory
 - `persist-mode.md` — `--persist` flag, session save/restore, `_DWM_SAVE_ARGV` IPC
 - `dwm-save.md` — `dwm-save` helper script for registering/clearing window save entries
+- `cfact-per-window-resize.md` — per-window column width resizing via `cfact` field in tilecols layout
 
 ## Building
 
@@ -51,7 +52,7 @@ Located in `reference/` — always read these before touching related features:
 cd /home/yeyito/Config/dwm && make && sudo make install
 ```
 
-No need for `make clean` — just `make && sudo make install`. Makefile targets: `all` (dwm), `clean`, `dist`, `install`, `uninstall`.
+No need for `make clean` — just `make && sudo make install`. Makefile targets: `all` (dwm), `clean`, `dist`, `install`, `uninstall`, `test`.
 
 ## Persist Mode (`--persist` / `-p`)
 
@@ -69,7 +70,7 @@ See `reference/persist-mode.md` and `reference/dwm-save.md` for full details.
 
 - `config.h` shows clang errors when analyzed standalone — expected, it's included during the main build.
 - The user wants changes built and installed immediately, not left as uncommitted edits.
-- No test suite — manual testing only.
+- Tests live in `test/` — run with `make test`. Tests extract pure math from layout/resize logic into standalone C that compiles without X11 dependencies.
 - dwmblocks (status bar) is a separate project at `/home/yeyito/Config/dwmblocks/` (dwmblocks-async fork). Restart it with `killall dwmblocks; setsid dwmblocks &` or just restart dwm.
 
 ---

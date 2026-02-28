@@ -1,6 +1,6 @@
 <memory-metadata>
 {
-  "frequency": 63,
+  "frequency": 71,
   "last_accessed_session": 0,
   "created_session": 0,
   "appreciation": 0,

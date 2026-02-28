@@ -1,0 +1,17 @@
+The memory file was verified thoroughly. **No changes were needed** — every factual claim checked out:
+
+- **`/etc/keyd/default.conf`** — exists, contents match (capslock→escape, escape→f13, right modifiers passed through)
+- **`keyd.service`** — enabled and active
+- **`/etc/modules-load.d/uinput.conf`** — exists
+- **User in `input` group** — confirmed
+- **`startx` alias in `~/.zshrc`** — confirmed (`startx -- -ardelay 200 -arinterval 22`)
+- **Right-shift zsh binding** — confirmed (`bindkey '\e]777;right-shift\a' autosuggest-accept`)
+- **`Config/st/x.c` and `config.h`** — both exist, contain right-shift escape sequence and `XK_Shift_R` handling
+- **`/usr/share/X11/xkb/symbols/inet` line 194** — confirmed `FK13` mapped to `F13` (patched)
+- **Pacman hook** (`/etc/pacman.d/hooks/xkb-f13.hook`) — exists, targets `xkeyboard-config`
+- **`~/Workspace/.cold/LockKeyboard/`** — exists, git tracked, `make install` installs to `~/.local/bin/`
+- **`lock-keyboard-daemon`** — exists at `~/.local/bin/`, source confirms expected behavior
+- **Old files removed** — `/usr/share/X11/xkb/symbols/custom`, `~/.Xmodmap`, `/etc/X11/xorg.conf.d/00-keyboard.conf` all confirmed absent
+- **Keycode 179 duplicate** — `<I179>` still maps to `XF86Tools` in inet symbols
+
+The memory is fully accurate and up to date.

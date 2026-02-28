@@ -1,7 +1,7 @@
 <memory-metadata>
 {
-  "frequency": 12,
-  "last_accessed_session": 595,
+  "frequency": 57,
+  "last_accessed_session": 1021,
   "created_session": 560,
   "appreciation": 0,
   "pinned": false
@@ -25,7 +25,9 @@ Anthropic accidentally shipped full inline source maps in @anthropic-ai/claude-c
 ## Build requirements
 - Bun >= 1.0, Node >= 18
 - `bun install` then `bun run build` (production single-file bundle) or `bun run dev` (tsx dev mode)
-- Uses Bun's `--define` flag for MACRO.* compile-time constants; dev mode uses preload script (`src/setup.ts`) setting globalThis.MACRO
+- Build uses Bun.build() API (scripts/build.mjs), matching Anthropic's toolchain
+- MACRO.* compile-time constants via define; dev mode uses preload script (src/setup.ts)
+- Dependencies pinned to exact versions from v0.2.32 publish date (2025-03-05); key transitive deps pinned via overrides in package.json
 
 ## Architecture — monolithic CLI: TypeScript + React/Ink for terminal UI, commander for arg parsing, Bun bundler
 
@@ -45,12 +47,17 @@ Anthropic accidentally shipped full inline source maps in @anthropic-ai/claude-c
 ## Added/stub files (not in original source map)
 - package.json, tsconfig.json, src/globals.d.ts, src/setup.ts
 - src/components/CustomSelect/index.ts (barrel re-export)
+- src/components/McpAddWizard.tsx (interactive MCP server setup wizard, added in v0.2.32)
 - src/utils/conversationRecovery.ts, src/utils/melonWrapper.ts (stubs)
-- src/tools/MemoryReadTool/prompt.ts, src/tools/MemoryWriteTool/prompt.ts (stubs)
+- src/tools/MemoryReadTool/prompt.ts, src/tools/MemoryWriteTool/prompt.ts (stubs, prompt.ts rewritten in v0.2.32)
+
+## Semantic diff verification
+Semantic diff compares our build against the npm binary at the AST level. Current v0.2.32 baseline: 2735 unchanged / 4480 npm chunks (61% match). String comparison: 5 missing app strings (all from intentional auto-updater stubs). See reference/build-toolchain.md for full details.
 
 ## Reference docs
 - reference/about.md — backstory of the source map leak
 - reference/build.md — build instructions and list of added/modified files
+- reference/build-toolchain.md — toolchain matching strategy, dep pinning, semantic diff baseline
 
 ---
 Update this memory when new tools, commands, hooks, or screens are added; when build process changes; or when build requirements are updated.

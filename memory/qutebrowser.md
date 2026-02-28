@@ -1,7 +1,7 @@
 <memory-metadata>
 {
-  "frequency": 69,
-  "last_accessed_session": 592,
+  "frequency": 156,
+  "last_accessed_session": 1194,
   "created_session": 0,
   "appreciation": 0,
   "pinned": true
@@ -9,11 +9,11 @@
 </memory-metadata>
 
 <conditional>
-Recall if the user prompt mentions qutebrowser, the custom QtWebEngine or Chromium build, submodule workflow, tab runtime, element shaders, hinting, or ladder-commit.
+Recall if the user prompt mentions qutebrowser, the custom QtWebEngine or Chromium build, submodule workflow, tab runtime, element shaders, hinting, ladder-commit, or chrome extensions.
 </conditional>
 
 <fuzzy-match>
-qutebrowser, qute, browser, qtwebengine, webengine, chromium, blink, pyqt6, sip bindings, submodule, ladder-commit, tab runtime, tabruntime, element shader, hinting, native elements, mojom, yeyito-browser, yeyitowebengine
+qutebrowser, qute, browser, qtwebengine, webengine, chromium, blink, pyqt6, sip bindings, submodule, ladder-commit, tab runtime, tabruntime, element shader, hinting, native elements, mojom, yeyito-browser, yeyitowebengine, chrome extension, crx, extension manager
 </fuzzy-match>
 
 <memory>
@@ -63,6 +63,11 @@ The `reference/` directory has detailed docs for specific subsystems. Read the r
 - `native-elements.md` — NativeTheme, Chromium native form controls (checkboxes, radios, etc.), Skia rendering
 - `dwm-persist.md` — dwm persist integration, `_DWM_SAVE_ARGV` X11 property set from `showEvent()`
 - `tab-runtime.md` — tab runtime manager, filesystem IPC for live tab state, signal wiring
+- `network-inspection.md` — network.sh usage guide, subcommands, filters, examples, JSON formats
+- `network-tab-tool.md` — network inspection technical reference (C++ buffer, Chromium data source, every file/function/line)
+- `command-eval.md` — command.sh / `:command-eval` technical reference (message hooking, JSON format, architecture)
+- `extensions.md` — Chrome extension system (loading, CRX extraction, `:extensions` list, `:uninstall-extension`, config API, reload)
+- `screenshot.md` — tab screenshot technical reference (C++ capture pipeline, focus suppression, every file/function)
 
 ## Building and installing
 

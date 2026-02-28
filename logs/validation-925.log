@@ -1,0 +1,18 @@
+
+
+Done. The subagent verified the memory file and made **8 updates** to reflect current reality:
+
+| # | What changed | Old | New |
+|---|---|---|---|
+| 1 | Migadu calendar support | No calendar (iMIP/iTIP broken) | Basic CalDAV/CardDAV (beta, not focus) |
+| 2 | MXroute pricing | $69-79/yr | $59-79/yr (Small $59, Medium $69, Large $79) |
+| 3 | Proton Mail pricing | $7-13/user/mo | $7.99-12.99/user/mo |
+| 4 | Tuta pricing | 3-8 EUR/user/mo | 6-8 EUR/user/mo |
+| 5 | Purelymail team | one-person operation | small team (hired 2 members, Feb 2026) |
+| 6 | Hetzner CX22 pricing | ~4.50 EUR/mo | ~3.79 EUR/mo |
+| 7 | Total VPS cost | ~$54/year | ~$45/year |
+| 8 | mailbox.org pricing | 1-9 EUR/user/mo | 1-7.50 EUR/user/mo |
+
+Everything else in the memory (Stalwart details, Fastmail, DNSimple, architecture, setup steps, etc.) was verified as still accurate and left unchanged. No `<memory-metadata>` or footer tags were modified.
+
+(The Lua diagnostics in the system reminder are unrelated to this task — they appear to be from a language server in your editor.)
